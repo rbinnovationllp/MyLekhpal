@@ -8,7 +8,10 @@ const input={action:'createBusiness',name:'Synthetic test '+stamp,year:2026,conf
 await call('POST','/api/books',{...input,confirmAccounts:false},422);
 const a=await call('POST','/api/books',input,201);
 const b=await call('POST','/api/books',{...input,name:'Second synthetic test '+stamp},201);
+assert.match(a.clientId,/^CL-[A-Z0-9]{10}$/);
+assert.notEqual(a.clientId,b.clientId);
 const ar=await call('GET','/api/books?business='+a.id,null,200);assert.equal(ar.accounts.length,8);assert.equal(ar.business.status,'Onboarding draft');
+assert.equal(ar.business.client_id,a.clientId);assert.equal(ar.business.active_role,'Business owner');assert.equal(ar.memberships.length,1);assert.equal(ar.memberships[0].role,'Business owner');
 const br=await call('GET','/api/books?business='+b.id,null,200);
 const entry={action:'createEntry',business:a.id,date:'2026-09-08',reference:'TEST-'+stamp,narration:'Synthetic test only',confirmBusiness:true,lines:[{account:ar.accounts[0].id,debit:'118.01'},{account:ar.accounts[5].id,credit:'100.01'},{account:ar.accounts[6].id,credit:'18'}]};
 await call('POST','/api/books',{...entry,lines:[{account:ar.accounts[0].id,debit:'118.01'},{account:ar.accounts[5].id,credit:'100'}]},422);
