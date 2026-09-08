@@ -8,6 +8,13 @@
       "when": 1788860267977,
       "tag": "0000_slim_blazing_skull",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1788883197286,
+      "tag": "0001_acoustic_ogun",
+      "breakpoints": true
     }
   ]
 }
