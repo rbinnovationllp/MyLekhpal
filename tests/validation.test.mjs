@@ -1,0 +1,12 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {paise,validateLines,validDate} from '../lib/validation.ts';
+const accounts=new Set(['cash','sales','tax']);
+test('money remains exact in paise',()=>{assert.equal(paise('0.10')+paise('0.20'),30);assert.equal(paise('100.01'),10001)});
+test('rejects negative, fractional paise and exponent amounts',()=>{for(const n of ['-1','1.001','1e3','NaN','Infinity'])assert.throws(()=>paise(n))});
+test('balanced simple journal',()=>assert.equal(validateLines([{account:'cash',debit:'118',credit:''},{account:'sales',debit:'',credit:'118'}],accounts).total,11800));
+test('balanced compound journal',()=>assert.equal(validateLines([{account:'cash',debit:'118'},{account:'sales',credit:'100'},{account:'tax',credit:'18'}],accounts).total,11800));
+test('rejects unbalanced entries',()=>assert.throws(()=>validateLines([{account:'cash',debit:'118'},{account:'sales',credit:'100'}],accounts),/balance/));
+test('rejects wrong business account',()=>assert.throws(()=>validateLines([{account:'foreign',debit:'100'},{account:'sales',credit:'100'}],accounts),/belonging/));
+test('rejects both debit and credit or empty lines',()=>{assert.throws(()=>validateLines([{account:'cash',debit:'100',credit:'1'},{account:'sales',credit:'99'}],accounts));assert.throws(()=>validateLines([{account:'cash'},{account:'sales'}],accounts));});
+test('financial-year boundaries and real calendar dates',()=>{assert.equal(validDate('2026-04-01',2026),'2026-04-01');assert.equal(validDate('2027-03-31',2026),'2027-03-31');for(const d of ['2026-03-31','2027-04-01','2026-02-30','2026-13-01','not a date'])assert.throws(()=>validDate(d,2026))});
