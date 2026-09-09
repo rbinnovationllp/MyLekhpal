@@ -1,0 +1,6 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": { "types": ["node", "vite/client"], "incremental": false },
+  "include": ["hostinger/**/*.ts", "hostinger/**/*.tsx", "app/page.tsx", "app/workspace/workspace.tsx", "components/**/*.tsx", "hooks/**/*.ts", "lib/**/*.ts", "vite.hostinger.config.ts"],
+  "exclude": ["node_modules", "app/api", "app/chatgpt-auth.ts", "db", "dist"]
+}

@@ -1,5 +1,6 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { booksRequest, prepareJournalDraft } from '../../hostinger/supabase';
 import {
   BookOpenCheck,
   Plus,
@@ -9,6 +10,13 @@ import {
   Building2,
   FileText,
   ShieldCheck,
+  Camera,
+  Upload,
+  FileSpreadsheet,
+  Image as ImageIcon,
+  AlertTriangle,
+  CheckCircle2,
+  X,
 } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import {
@@ -39,6 +47,38 @@ const money = (n: number) =>
     n / 100,
   );
 const blankLine = () => ({ account: '', debit: '', credit: '' });
+type ImportResult = {
+  name: string;
+  kind: 'spreadsheet' | 'image' | 'document';
+  preview?: string;
+  date: string;
+  reference: string;
+  party: string;
+  description: string;
+  taxableAmount: string;
+  gst: string;
+  total: string;
+  missing: string[];
+};
+const csvRow = (line: string) => {
+  const values: string[] = [];
+  let value = '', quoted = false;
+  for (let i = 0; i < line.length; i += 1) {
+    const char = line[i];
+    if (char === '"' && line[i + 1] === '"' && quoted) { value += '"'; i += 1; }
+    else if (char === '"') quoted = !quoted;
+    else if (char === ',' && !quoted) { values.push(value.trim()); value = ''; }
+    else value += char;
+  }
+  values.push(value.trim());
+  return values;
+};
+const dateFromValue = (value: string) => {
+  const iso = value.match(/^\d{4}-\d{2}-\d{2}/)?.[0];
+  if (iso) return iso;
+  const date = new Date(value);
+  return Number.isNaN(date.valueOf()) ? '' : date.toISOString().slice(0, 10);
+};
 export default function Workspace({ user }: { user: string }) {
   const [businesses, setBusinesses] = useState<any[]>([]),
     [active, setActive] = useState(''),
@@ -54,24 +94,16 @@ export default function Workspace({ user }: { user: string }) {
     [confirm, setConfirm] = useState(false),
     [confirmBusiness, setConfirmBusiness] = useState(false),
     [lines, setLines] = useState([blankLine(), blankLine()]),
+    [journal, setJournal] = useState({ date: '', reference: '', narration: '' }),
+    [imported, setImported] = useState<ImportResult | null>(null),
+    [importFile, setImportFile] = useState<File | null>(null),
+    [aiDraft, setAiDraft] = useState<any>(null),
+    [aiBusy, setAiBusy] = useState(false),
     [hi, setHi] = useState(false);
+  const uploadRef = useRef<HTMLInputElement>(null);
+  const cameraRef = useRef<HTMLInputElement>(null);
   const t = (en: string, hindi: string) => (hi ? hindi : en);
-  async function request(url: string, body?: any) {
-    const res = await fetch(
-      url,
-      body
-        ? {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(body),
-          }
-        : undefined,
-    );
-    const result: any = await res.json();
-    if (!res.ok)
-      throw new Error(result.error || 'Request failed. Please retry.');
-    return result;
-  }
+  const request = booksRequest;
   async function loadBusinesses() {
     setLoading(true);
     try {
@@ -98,6 +130,10 @@ export default function Workspace({ user }: { user: string }) {
     setData(null);
     setConfirmBusiness(false);
     setLines([blankLine(), blankLine()]);
+    setJournal({ date: '', reference: '', narration: '' });
+    setImported(null);
+    setImportFile(null);
+    setAiDraft(null);
     setDetail(null);
     if (active) {
       setLoading(true);
@@ -207,6 +243,10 @@ export default function Workspace({ user }: { user: string }) {
       await refresh(active);
       form.reset();
       setLines([blankLine(), blankLine()]);
+      setJournal({ date: '', reference: '', narration: '' });
+      setImported(null);
+      setImportFile(null);
+      setAiDraft(null);
       setConfirmBusiness(false);
       setTab('journal');
       setNotice(
@@ -220,6 +260,62 @@ export default function Workspace({ user }: { user: string }) {
     } finally {
       setBusy(false);
     }
+  }
+  function suggestedLines(description: string, amount: string) {
+    const words = description.toLowerCase();
+    const account = (terms: string[]) =>
+      data.accounts.find((a: any) => terms.some((term) => a.name.toLowerCase().includes(term)))?.id || '';
+    const cash = account(['cash', 'bank']);
+    if (words.includes('sale') || words.includes('invoice'))
+      return [{ account: account(['receivable', 'bank', 'cash']), debit: amount, credit: '' }, { account: account(['sales']), debit: '', credit: amount }];
+    if (words.includes('purchase') || words.includes('supplier'))
+      return [{ account: account(['purchases']), debit: amount, credit: '' }, { account: account(['payable', 'cash', 'bank']), debit: '', credit: amount }];
+    return [{ account: account(['expense']), debit: amount, credit: '' }, { account: cash, debit: '', credit: amount }];
+  }
+  function applyImport(result: ImportResult) {
+    const narration = [result.description, result.party && `Party: ${result.party}`].filter(Boolean).join(' · ');
+    setJournal({ date: result.date, reference: result.reference, narration });
+    if (result.total) setLines(suggestedLines(narration, result.total));
+    setNotice(t('Suggested details were added to this draft. Review every field before saving.', 'सुझाए गए विवरण ड्राफ्ट में जोड़ दिए गए हैं। सहेजने से पहले हर फ़ील्ड जाँचें।'));
+  }
+  async function readImport(file: File) {
+    setImportFile(file);
+    const image = file.type.startsWith('image/');
+    const spreadsheet = file.name.toLowerCase().endsWith('.csv') || file.type.includes('csv');
+    const base: ImportResult = { name: file.name, kind: image ? 'image' : spreadsheet ? 'spreadsheet' : 'document', preview: image ? URL.createObjectURL(file) : undefined, date: '', reference: '', party: '', description: '', taxableAmount: '', gst: '', total: '', missing: ['Transaction date', 'Reference number', 'Party', 'Amount'] };
+    if (spreadsheet) {
+      const rows = (await file.text()).split(/\r?\n/).filter(Boolean).map(csvRow);
+      const headers = rows[0]?.map((x) => x.toLowerCase().replace(/[^a-z0-9]/g, '')) || [];
+      const row = rows[1] || [];
+      const field = (...names: string[]) => row[headers.findIndex((header) => names.some((name) => header.includes(name)))] || '';
+      base.date = dateFromValue(field('date', 'invoicedate', 'transactiondate'));
+      base.reference = field('invoice', 'reference', 'voucher', 'billno');
+      base.party = field('party', 'vendor', 'supplier', 'customer', 'customername');
+      base.description = field('description', 'narration', 'particular', 'item') || 'Imported CSV transaction';
+      base.taxableAmount = field('taxable', 'subtotal', 'amount');
+      base.gst = field('gst', 'tax');
+      base.total = field('total', 'grandtotal', 'amount') || base.taxableAmount;
+      base.missing = [['Transaction date', base.date], ['Reference number', base.reference], ['Party', base.party], ['Amount', base.total]].filter(([, value]) => !value).map(([label]) => label as string);
+    } else {
+      base.description = image ? 'Photo captured for review' : 'Document uploaded for review';
+      base.missing = ['Transaction date', 'Reference number', 'Party', 'Taxable amount', 'GST', 'Total amount'];
+    }
+    setImported(base);
+    await analyseWithClaude(file, spreadsheet ? 'excel_csv_import' : image ? 'invoice_upload' : 'receipt_upload');
+  }
+  async function analyseWithClaude(file: File, sourceMethod: string) {
+    setAiBusy(true); setError(''); setAiDraft(null);
+    try {
+      const base64 = await new Promise<string>((resolve, reject) => { const reader = new FileReader(); reader.onerror = () => reject(new Error('Unable to read the selected file.')); reader.onload = () => resolve(String(reader.result).split(',')[1] || ''); reader.readAsDataURL(file); });
+      const result = await prepareJournalDraft({ businessId: active, sourceMethod, file: { name: file.name, type: file.type, base64 } });
+      const draft = result.draft;
+      setJournal({ date: draft.transaction_date || '', reference: draft.reference || '', narration: draft.narration || '' });
+      setLines(draft.lines.map((line: any) => ({ account: line.account_id, debit: line.debit ? String(line.debit) : '', credit: line.credit ? String(line.credit) : '' })));
+      setAiDraft({ ...draft, model: result.model, requestId: result.requestId, skill: result.skill });
+      setImported((current) => current ? { ...current, date: draft.transaction_date || '', reference: draft.reference || '', party: draft.party_name || '', description: draft.narration || current.description, taxableAmount: draft.taxable_amount == null ? '' : String(draft.taxable_amount), gst: draft.gst_amount == null ? '' : String(draft.gst_amount), total: draft.total_amount == null ? '' : String(draft.total_amount), missing: (draft.completeness || []).filter((item: any) => ['missing', 'invalid', 'inconsistent', 'pending_professional_review'].includes(item.status)).map((item: any) => item.field) } : current);
+      setNotice(t(`Claude (${result.model}) prepared a ${draft.status} draft (${draft.confidence} confidence). Request ${result.requestId}. Review it before saving.`, `Claude ने ${draft.status} ड्राफ्ट तैयार किया। सहेजने से पहले जाँचें।`));
+    } catch (e: any) { setError(e.message || 'Claude processing could not prepare a draft.'); }
+    finally { setAiBusy(false); }
   }
   function exportCsv() {
     const rows = [
@@ -285,17 +381,14 @@ export default function Workspace({ user }: { user: string }) {
             {hi ? 'English' : 'हिन्दी'}
           </button>
           <span className="user-name">{user}</span>
-          <a className="quiet" href="/signout-with-chatgpt?return_to=/">
-            {t('Sign out', 'साइन आउट')}
-          </a>
         </div>
       </header>
       <div className="workspace-main">
         <div className="notice">
           <ShieldCheck size={18} />
           {t(
-            'Foundation preview · Use test records. Onboarding and journal drafts are available; professional review, AI processing and posting are not yet enabled.',
-            'प्रारंभिक संस्करण · केवल परीक्षण रिकॉर्ड उपयोग करें। सेटअप और जर्नल ड्राफ्ट उपलब्ध हैं; पेशेवर समीक्षा, AI और पोस्टिंग अभी उपलब्ध नहीं हैं।',
+            'Claude AI prepares reviewable journal drafts from supported documents. It never posts entries automatically; use test records until professional review is configured.',
+            'Claude AI समर्थित दस्तावेज़ों से समीक्षा योग्य जर्नल ड्राफ्ट तैयार करता है। यह कभी अपने-आप प्रविष्टियाँ पोस्ट नहीं करता; पेशेवर समीक्षा सेट होने तक परीक्षण रिकॉर्ड उपयोग करें।',
           )}
         </div>
         {error && (
@@ -669,6 +762,50 @@ export default function Workspace({ user }: { user: string }) {
                       'अपने व्यवसाय के खाते उपयोग करें। डेबिट और क्रेडिट संतुलित होना चाहिए।',
                     )}
                   </p>
+                  <div className="document-import" aria-labelledby="document-import-title">
+                    <div className="import-heading">
+                      <div>
+                        <span className="eyebrow">{t('DOCUMENT ASSIST', 'दस्तावेज़ सहायता')}</span>
+                        <h3 id="document-import-title">{t('Start from a document or photo', 'दस्तावेज़ या फ़ोटो से शुरू करें')}</h3>
+                        <p>{t('This submission is processed using Claude AI. Add a CSV, Excel file, PDF, invoice, receipt or handwritten chit; Claude prepares a reviewable draft and never posts automatically.', 'यह सबमिशन Claude AI द्वारा प्रोसेस किया जाता है। Claude समीक्षा योग्य ड्राफ्ट तैयार करता है और कभी अपने-आप पोस्ट नहीं करता।')}</p>
+                      </div>
+                    </div>
+                    <div className="import-actions">
+                      <button type="button" className="import-action" onClick={() => uploadRef.current?.click()}>
+                        <Upload size={21} />
+                        <span><b>{t('Upload document / file', 'दस्तावेज़ / फ़ाइल अपलोड करें')}</b><small>{t('Excel, CSV, PDF, image or receipt', 'Excel, CSV, PDF, इमेज या रसीद')}</small></span>
+                      </button>
+                      <button type="button" className="import-action camera" onClick={() => cameraRef.current?.click()}>
+                        <Camera size={21} />
+                        <span><b>{t('Take photo', 'फ़ोटो लें')}</b><small>{t('Open your phone camera now', 'अभी फ़ोन कैमरा खोलें')}</small></span>
+                      </button>
+                    </div>
+                    <input ref={uploadRef} className="sr-only" type="file" accept=".csv,.xlsx,.xls,.pdf,image/*,.heic" onChange={(e) => { const file = e.target.files?.[0]; if (file) void readImport(file); e.currentTarget.value = ''; }} />
+                    <input ref={cameraRef} className="sr-only" type="file" accept="image/*" capture="environment" onChange={(e) => { const file = e.target.files?.[0]; if (file) void readImport(file); e.currentTarget.value = ''; }} />
+                    {imported && <div className="import-review">
+                      <div className="import-preview">
+                        {imported.preview ? <img src={imported.preview} alt={`Preview of ${imported.name}`} /> : imported.kind === 'spreadsheet' ? <FileSpreadsheet aria-hidden="true" /> : <FileText aria-hidden="true" />}
+                        <span>{imported.name}</span>
+                        <button type="button" className="quiet" aria-label={t('Remove document', 'दस्तावेज़ हटाएँ')} onClick={() => { if (imported.preview) URL.revokeObjectURL(imported.preview); setImported(null); setImportFile(null); }}><X size={18} /></button>
+                      </div>
+                      <div className="extraction-status">
+                        {imported.kind === 'spreadsheet' ? <CheckCircle2 size={18} /> : <AlertTriangle size={18} />}
+                        <div><b>{aiBusy ? t('Claude is preparing your draft', 'Claude आपका ड्राफ्ट तैयार कर रहा है') : aiDraft ? t('Claude draft ready for review', 'Claude ड्राफ्ट समीक्षा के लिए तैयार है') : t('Document selected', 'दस्तावेज़ चुना गया')}</b><span>{aiBusy ? t('Please wait while details, GST treatment, accounts and debits/credits are checked.', 'विवरण, GST, खाते और डेबिट/क्रेडिट की जाँच हो रही है।') : aiDraft ? t('Details below are a draft only. Correct anything uncertain before you save.', 'नीचे के विवरण केवल ड्राफ्ट हैं। सहेजने से पहले अनिश्चित जानकारी सुधारें।') : t('Processing starts automatically after a supported document is selected.', 'समर्थित दस्तावेज़ चुनते ही प्रोसेसिंग अपने-आप शुरू होती है।')}</span></div>
+                      </div>
+                      <div className="extracted-grid">
+                        <span><small>{t('Date', 'तारीख')}</small><b>{imported.date || '—'}</b></span>
+                        <span><small>{t('Reference', 'संदर्भ')}</small><b>{imported.reference || '—'}</b></span>
+                        <span><small>{t('Party', 'पार्टी')}</small><b>{imported.party || '—'}</b></span>
+                        <span><small>{t('Taxable amount', 'कर योग्य राशि')}</small><b>{imported.taxableAmount || '—'}</b></span>
+                        <span><small>GST</small><b>{imported.gst || '—'}</b></span>
+                        <span><small>{t('Total', 'कुल')}</small><b>{imported.total || '—'}</b></span>
+                      </div>
+                      {imported.missing.length > 0 && <p className="missing"><AlertTriangle size={16} /> {t('Needs your attention:', 'आपका ध्यान आवश्यक:')} {imported.missing.join(', ')}</p>}
+                      {aiDraft?.clarifications?.length > 0 && <p className="missing"><AlertTriangle size={16} /> {t('Claude needs clarification:', 'Claude को स्पष्टीकरण चाहिए:')} {aiDraft.clarifications.join(', ')}</p>}
+                      {aiDraft?.exceptions?.length > 0 && <p className="missing"><AlertTriangle size={16} /> {t('Review flags:', 'समीक्षा संकेत:')} {aiDraft.exceptions.join(', ')}</p>}
+                      {aiBusy && <p role="status" className="helper">{t('Claude is extracting details and preparing a draft…', 'Claude विवरण निकालकर ड्राफ्ट तैयार कर रहा है…')}</p>}
+                    </div>}
+                  </div>
                   <form onSubmit={saveEntry}>
                     <div className="form-grid">
                       <label>
@@ -679,6 +816,8 @@ export default function Workspace({ user }: { user: string }) {
                           min={`${data.business.year}-04-01`}
                           max={`${data.business.year + 1}-03-31`}
                           required
+                          value={journal.date}
+                          onChange={(e) => setJournal({ ...journal, date: e.target.value })}
                         />
                       </label>
                       <label>
@@ -688,6 +827,8 @@ export default function Workspace({ user }: { user: string }) {
                           maxLength={100}
                           required
                           placeholder="JV-001"
+                          value={journal.reference}
+                          onChange={(e) => setJournal({ ...journal, reference: e.target.value })}
                         />
                       </label>
                       <label className="full">
@@ -700,6 +841,8 @@ export default function Workspace({ user }: { user: string }) {
                             'Describe this transaction',
                             'इस लेनदेन का विवरण दें',
                           )}
+                          value={journal.narration}
+                          onChange={(e) => setJournal({ ...journal, narration: e.target.value })}
                         />
                       </label>
                     </div>
@@ -934,3 +1077,5 @@ export default function Workspace({ user }: { user: string }) {
     </main>
   );
 }
+
+
