@@ -66,11 +66,6 @@ export async function GET(req: Request) {
     )
       .bind(businessId)
       .all(),
-    env.DB.prepare(
-      'SELECT user_id, role, status, created_at FROM memberships WHERE business_id = ? ORDER BY created_at',
-    )
-      .bind(businessId)
-      .all(),
   ]);
 
   return respond({
@@ -78,7 +73,6 @@ export async function GET(req: Request) {
     accounts: accounts.results,
     entries: entries.results,
     audit: audit.results,
-    memberships: memberships.results,
   });
 }
 
