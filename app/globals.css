@@ -85,10 +85,14 @@ svg {
   align-items: center;
   gap: 9px;
 }
-.brand svg {
-  color: #08745c;
-  width: 30px;
-  height: 30px;
+.brand-mark {
+  width: 34px;
+  height: 34px;
+  object-fit: cover;
+  object-position: 50% 28%;
+  border-radius: 50%;
+  border: 2px solid #e2af42;
+  box-shadow: 0 2px 8px #9d661c33;
 }
 .brand-dot {
   color: #07825e;

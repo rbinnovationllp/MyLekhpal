@@ -1,6 +1,5 @@
 import {
   ArrowUpRight,
-  BookOpenCheck,
   Check,
   ArrowRight,
   FileText,
@@ -21,7 +20,11 @@ export default function Home() {
     <main>
       <nav className="nav wrap">
         <a href="/" className="brand">
-          <BookOpenCheck />
+          <img
+            className="brand-mark"
+            src="/brand/mylekhpal-logo.png"
+            alt="Mylekhpal logo"
+          />
           mylekhpal<span className="brand-dot">.</span>
         </a>
         <div className="navlinks">
@@ -237,7 +240,11 @@ export default function Home() {
       </section>
       <footer className="wrap">
         <a className="brand" href="/">
-          <BookOpenCheck />
+          <img
+            className="brand-mark"
+            src="/brand/mylekhpal-logo.png"
+            alt="Mylekhpal logo"
+          />
           mylekhpal.
         </a>
         <div className="footer-contact">
