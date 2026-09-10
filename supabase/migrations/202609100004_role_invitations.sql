@@ -41,7 +41,7 @@ begin
   select * into invite from public.business_invitations where id=invitation_id for update;
   if not found or invite.status <> 'pending' or invite.expires_at < now() or lower(invite.email) <> lower(coalesce(auth.jwt()->>'email','')) then raise exception 'This invitation is unavailable.' using errcode='42501'; end if;
   insert into public.business_memberships(business_id,user_id,role,status) values(invite.business_id,actor,invite.role,'active')
-    on conflict (business_id,user_id) do update set role=excluded.role,status='active';
+    on conflict (business_id,user_id,role) do update set status='active';
   update public.business_invitations set status='accepted',accepted_by=actor,accepted_at=now() where id=invite.id;
   insert into public.audit_log(business_id,actor_user_id,actor_type,action,entity_type,entity_id,after_state)
     values(invite.business_id,actor,'human','Member invitation accepted','business_invitation',invite.id,jsonb_build_object('role',invite.role));
