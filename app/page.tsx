@@ -220,23 +220,45 @@ export default function Home() {
             Mylekhpal brings both sides together, with simple business summaries
             and room for the accounting detail that matters.
           </p>
-          <a className="button" href="/workspace">
-            Open your workspace <ArrowUpRight size={18} />
+          <a className="button" href="/workspace?role=owner">
+            Choose your role <ArrowUpRight size={18} />
           </a>
         </div>
         <div className="collab">
-          <div>
+          <a className="role-card" href="/workspace?role=owner">
             <span className="avatar">BO</span>
             <b>Business owner</b>
             <small>Capture records · Answer queries</small>
-          </div>
+            <em>Sign in as Business Owner</em>
+          </a>
           <span className="connection">Shared records · Clear review</span>
-          <div>
+          <a className="role-card" href="/workspace?role=ca_partner">
             <span className="avatar blue">CA</span>
             <b>Chartered Accountant</b>
             <small>Review entries · Prepare compliance</small>
-          </div>
+            <em>Sign in as Chartered Accountant</em>
+          </a>
+          <a className="role-card" href="/workspace?role=accountant">
+            <span className="avatar bookkeeper">AB</span>
+            <b>Accountant / Bookkeeper</b>
+            <small>Maintain books for businesses that appoint you</small>
+            <em>Sign in as Accountant/Bookkeeper</em>
+          </a>
         </div>
+      </section>
+      <section className="section wrap compliance-notice" id="compliance">
+        <span className="eyebrow">COMPLIANCE &amp; PROFESSIONAL USE</span>
+        <h2>Important information for clients</h2>
+        <p><b>MyLekhapal is an accounting-software platform developed by Rashi Bhartiya Innovation LLP.</b> It is not presented as government-approved, GSTN-certified, or as a replacement for a Chartered Accountant, statutory auditor, tax practitioner, or other authorised professional.</p>
+        <p>The service prepares accounting drafts for verification. Accounting, GST treatment, audit-trail review, and any filing remain subject to client and qualified-professional approval.</p>
+        <div className="compliance-grid">
+          <article><b>Journals, ledgers and reports</b><span>The platform supports preparation and review of accounting records; it does not claim a special government software licence.</span></article>
+          <article><b>GST filing and e-invoicing</b><span>Direct government filing or e-invoice connections are not offered unless the required authorised GSTN/GSP route and approvals are in place.</span></article>
+          <article><b>Professional services</b><span>MyLekhapal does not certify accounts, perform statutory audits, or replace regulated professional services.</span></article>
+          <article><b>Audit trail and changes</b><span>The product is designed to support identifiable, timestamped changes, approvals, reversals, and period controls. Finalised records must not be silently changed.</span></article>
+        </div>
+        <p className="helper">If a future government integration is introduced, MyLekhapal will use the appropriate authorised route before that capability is advertised. No “government-approved” claim will be used without written approval from the relevant authority.</p>
+        <p className="helper">For context, see <a href="https://www.gstn.org.in/" target="_blank" rel="noreferrer">GSTN</a> and <a href="https://tallysolutions.com/accounting/what-accounting-software-is-considered-a-safe-bet-for-long-term-government-and-tax-compliance-in-india/" target="_blank" rel="noreferrer">Tally’s guidance</a>. This notice is informational and not legal or tax advice.</p>
       </section>
       <footer className="wrap">
         <a className="brand" href="/">

@@ -73,12 +73,12 @@ Deno.serve(async (req) => {
       body: JSON.stringify({ model: Deno.env.get('MYLEKHAPAL_ANTHROPIC_MODEL') || 'claude-sonnet-4-6', max_tokens: 3500, system: runtimeInstructions(accounts, business, Boolean(matchingSource)), messages: [{ role: 'user', content: [...contentFor(input.file), { type: 'text', text: `Source method: ${input.sourceMethod}. Manual context: ${input.manualText || '(none)'}. Prepare the journal draft now.` }] }], tools: [{ name: 'prepare_journal_draft', description: 'Return one reviewable accounting draft only.', input_schema: draftSchema }], tool_choice: { type: 'tool', name: 'prepare_journal_draft' } }),
     });
     const requestId = api.headers.get('request-id') || crypto.randomUUID(), result = await api.json();
-    if (!api.ok) return respond({ error: 'Claude processing is unavailable.', requestId }, 502, requestId);
+    if (!api.ok) return respond({ error: 'Journal draft preparation is temporarily unavailable.', requestId }, 502, requestId);
     const draft = result.content?.find((b: { type: string }) => b.type === 'tool_use')?.input;
-    if (!draft?.lines?.length) return respond({ error: 'Claude returned no valid draft.', requestId }, 502, requestId);
+    if (!draft?.lines?.length) return respond({ error: 'No valid journal draft was returned.', requestId }, 502, requestId);
     const accountIds = new Set(accounts.map((a) => a.id));
     const debit = draft.lines.reduce((n: number, x: { debit?: number }) => n + Number(x.debit || 0), 0), credit = draft.lines.reduce((n: number, x: { credit?: number }) => n + Number(x.credit || 0), 0);
-    if (draft.lines.some((x: { account_id: string; debit?: number; credit?: number }) => !accountIds.has(x.account_id) || (Number(x.debit || 0) > 0) === (Number(x.credit || 0) > 0)) || Math.abs(debit - credit) > 0.01) return respond({ error: 'Claude proposal failed account or balance validation.', requestId }, 422, requestId);
+    if (draft.lines.some((x: { account_id: string; debit?: number; credit?: number }) => !accountIds.has(x.account_id) || (Number(x.debit || 0) > 0) === (Number(x.credit || 0) > 0)) || Math.abs(debit - credit) > 0.01) return respond({ error: 'The proposed draft did not pass account or balance validation.', requestId }, 422, requestId);
     const { data: doc, error } = await admin.from('source_documents').insert({ business_id: input.businessId, doc_type: input.sourceMethod, storage_provider: 'ephemeral_processed_only', file_name: input.file?.name || 'manual-entry.txt', file_hash: sourceHash, extracted_fields: draft, ocr_confidence: draft.confidence, uploaded_by: user.id }).select('id').single();
     if (error) throw new Error('Could not record the processed source.');
     await admin.from('usage_records').insert([{ business_id: input.businessId, user_id: user.id, event_type: 'ai_document_processed', quantity: 1, estimated_cost: 0 }, { business_id: input.businessId, user_id: user.id, event_type: 'ai_tokens', quantity: Number(result.usage?.input_tokens || 0) + Number(result.usage?.output_tokens || 0), estimated_cost: 0 }]);

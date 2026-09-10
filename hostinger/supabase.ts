@@ -17,7 +17,7 @@ export async function prepareJournalDraft(payload: unknown) {
   const { data, error } = await supabase.functions.invoke('prepare-journal-draft', {
     body: payload,
   });
-  if (error) throw new Error(error.message || 'Claude processing is unavailable.');
+  if (error) throw new Error(error.message || 'Journal draft preparation is unavailable.');
   if (data?.error) throw new Error(data.error);
   return data;
 }

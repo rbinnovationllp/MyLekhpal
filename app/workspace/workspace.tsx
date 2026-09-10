@@ -313,8 +313,8 @@ export default function Workspace({ user }: { user: string }) {
       setLines(draft.lines.map((line: any) => ({ account: line.account_id, debit: line.debit ? String(line.debit) : '', credit: line.credit ? String(line.credit) : '' })));
       setAiDraft({ ...draft, model: result.model, requestId: result.requestId, skill: result.skill });
       setImported((current) => current ? { ...current, date: draft.transaction_date || '', reference: draft.reference || '', party: draft.party_name || '', description: draft.narration || current.description, taxableAmount: draft.taxable_amount == null ? '' : String(draft.taxable_amount), gst: draft.gst_amount == null ? '' : String(draft.gst_amount), total: draft.total_amount == null ? '' : String(draft.total_amount), missing: (draft.completeness || []).filter((item: any) => ['missing', 'invalid', 'inconsistent', 'pending_professional_review'].includes(item.status)).map((item: any) => item.field) } : current);
-      setNotice(t(`Claude (${result.model}) prepared a ${draft.status} draft (${draft.confidence} confidence). Request ${result.requestId}. Review it before saving.`, `Claude ने ${draft.status} ड्राफ्ट तैयार किया। सहेजने से पहले जाँचें।`));
-    } catch (e: any) { setError(e.message || 'Claude processing could not prepare a draft.'); }
+      setNotice(t(`MyLekhapal Intelligence prepared a ${draft.status} draft. Review required before saving.`, `MyLekhapal Intelligence ने ${draft.status} ड्राफ्ट तैयार किया। सहेजने से पहले समीक्षा आवश्यक है।`));
+    } catch { setError(t('We could not prepare a journal draft. Please try again.', 'जर्नल ड्राफ्ट तैयार नहीं हो सका। कृपया पुनः प्रयास करें।')); }
     finally { setAiBusy(false); }
   }
   function exportCsv() {
@@ -387,8 +387,8 @@ export default function Workspace({ user }: { user: string }) {
         <div className="notice">
           <ShieldCheck size={18} />
           {t(
-            'Claude AI prepares reviewable journal drafts from supported documents. It never posts entries automatically; use test records until professional review is configured.',
-            'Claude AI समर्थित दस्तावेज़ों से समीक्षा योग्य जर्नल ड्राफ्ट तैयार करता है। यह कभी अपने-आप प्रविष्टियाँ पोस्ट नहीं करता; पेशेवर समीक्षा सेट होने तक परीक्षण रिकॉर्ड उपयोग करें।',
+            'MyLekhapal Intelligence prepares reviewable journal drafts from supported documents. It never posts entries automatically; use test records until professional review is configured.',
+            'MyLekhapal Intelligence समर्थित दस्तावेज़ों से समीक्षा योग्य जर्नल ड्राफ्ट तैयार करता है। यह कभी अपने-आप प्रविष्टियाँ पोस्ट नहीं करता; पेशेवर समीक्षा सेट होने तक परीक्षण रिकॉर्ड उपयोग करें।',
           )}
         </div>
         {error && (
@@ -767,7 +767,7 @@ export default function Workspace({ user }: { user: string }) {
                       <div>
                         <span className="eyebrow">{t('DOCUMENT ASSIST', 'दस्तावेज़ सहायता')}</span>
                         <h3 id="document-import-title">{t('Start from a document or photo', 'दस्तावेज़ या फ़ोटो से शुरू करें')}</h3>
-                        <p>{t('This submission is processed using Claude AI. Add a CSV, Excel file, PDF, invoice, receipt or handwritten chit; Claude prepares a reviewable draft and never posts automatically.', 'यह सबमिशन Claude AI द्वारा प्रोसेस किया जाता है। Claude समीक्षा योग्य ड्राफ्ट तैयार करता है और कभी अपने-आप पोस्ट नहीं करता।')}</p>
+                        <p>{t('This submission is processed by MyLekhapal Intelligence. Add a CSV, Excel file, PDF, invoice, receipt or handwritten chit; it prepares a reviewable draft and never posts automatically.', 'यह सबमिशन MyLekhapal Intelligence द्वारा प्रोसेस किया जाता है। यह समीक्षा योग्य ड्राफ्ट तैयार करता है और कभी अपने-आप पोस्ट नहीं करता।')}</p>
                       </div>
                     </div>
                     <div className="import-actions">
@@ -790,7 +790,7 @@ export default function Workspace({ user }: { user: string }) {
                       </div>
                       <div className="extraction-status">
                         {imported.kind === 'spreadsheet' ? <CheckCircle2 size={18} /> : <AlertTriangle size={18} />}
-                        <div><b>{aiBusy ? t('Claude is preparing your draft', 'Claude आपका ड्राफ्ट तैयार कर रहा है') : aiDraft ? t('Claude draft ready for review', 'Claude ड्राफ्ट समीक्षा के लिए तैयार है') : t('Document selected', 'दस्तावेज़ चुना गया')}</b><span>{aiBusy ? t('Please wait while details, GST treatment, accounts and debits/credits are checked.', 'विवरण, GST, खाते और डेबिट/क्रेडिट की जाँच हो रही है।') : aiDraft ? t('Details below are a draft only. Correct anything uncertain before you save.', 'नीचे के विवरण केवल ड्राफ्ट हैं। सहेजने से पहले अनिश्चित जानकारी सुधारें।') : t('Processing starts automatically after a supported document is selected.', 'समर्थित दस्तावेज़ चुनते ही प्रोसेसिंग अपने-आप शुरू होती है।')}</span></div>
+                        <div><b>{aiBusy ? t('Preparing your journal draft', 'आपका जर्नल ड्राफ्ट तैयार हो रहा है') : aiDraft ? t('Review required', 'समीक्षा आवश्यक') : t('Document selected', 'दस्तावेज़ चुना गया')}</b><span>{aiBusy ? t('MyLekhapal Intelligence is checking details, GST treatment, accounts and debits/credits.', 'MyLekhapal Intelligence विवरण, GST, खाते और डेबिट/क्रेडिट की जाँच कर रहा है।') : aiDraft ? t('Details below are a draft only. Correct anything uncertain before you save.', 'नीचे के विवरण केवल ड्राफ्ट हैं। सहेजने से पहले अनिश्चित जानकारी सुधारें।') : t('Processing starts automatically after a supported document is selected.', 'समर्थित दस्तावेज़ चुनते ही प्रोसेसिंग अपने-आप शुरू होती है।')}</span></div>
                       </div>
                       <div className="extracted-grid">
                         <span><small>{t('Date', 'तारीख')}</small><b>{imported.date || '—'}</b></span>
@@ -801,9 +801,9 @@ export default function Workspace({ user }: { user: string }) {
                         <span><small>{t('Total', 'कुल')}</small><b>{imported.total || '—'}</b></span>
                       </div>
                       {imported.missing.length > 0 && <p className="missing"><AlertTriangle size={16} /> {t('Needs your attention:', 'आपका ध्यान आवश्यक:')} {imported.missing.join(', ')}</p>}
-                      {aiDraft?.clarifications?.length > 0 && <p className="missing"><AlertTriangle size={16} /> {t('Claude needs clarification:', 'Claude को स्पष्टीकरण चाहिए:')} {aiDraft.clarifications.join(', ')}</p>}
+                      {aiDraft?.clarifications?.length > 0 && <p className="missing"><AlertTriangle size={16} /> {t('More information is needed:', 'अधिक जानकारी आवश्यक है:')} {aiDraft.clarifications.join(', ')}</p>}
                       {aiDraft?.exceptions?.length > 0 && <p className="missing"><AlertTriangle size={16} /> {t('Review flags:', 'समीक्षा संकेत:')} {aiDraft.exceptions.join(', ')}</p>}
-                      {aiBusy && <p role="status" className="helper">{t('Claude is extracting details and preparing a draft…', 'Claude विवरण निकालकर ड्राफ्ट तैयार कर रहा है…')}</p>}
+                      {aiBusy && <p role="status" className="helper">{t('MyLekhapal Intelligence is preparing a draft…', 'MyLekhapal Intelligence ड्राफ्ट तैयार कर रहा है…')}</p>}
                     </div>}
                   </div>
                   <form onSubmit={saveEntry}>

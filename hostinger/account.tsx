@@ -4,6 +4,7 @@ import { supabase } from './supabase';
 import Workspace from '../app/workspace/workspace';
 
 export default function Account() {
+  const requestedRole = new URLSearchParams(window.location.search).get('role');
   const [session, setSession] = useState<Session | null>(null);
   const [ready, setReady] = useState(false);
   const [mode, setMode] = useState<'signin' | 'signup' | 'reset' | 'update'>('signin');
@@ -39,7 +40,9 @@ export default function Account() {
         if (error) throw error;
         setMode('signin');
       } else if (mode === 'signup') {
-        const { data, error } = await supabase.auth.signUp({ email, password, options: { emailRedirectTo: redirectTo } });
+        const allowed = ['owner', 'ca_partner', 'accountant'];
+        const role = allowed.includes(requestedRole || '') ? requestedRole : undefined;
+        const { data, error } = await supabase.auth.signUp({ email, password, options: { emailRedirectTo: redirectTo, data: role ? { requested_role: role } : {} } });
         if (error) throw error;
         if (!data.session) setNotice('Check your email to confirm your account, then sign in.');
       } else {
@@ -60,7 +63,8 @@ export default function Account() {
     </div>
     <Workspace key={session.user.id} user={session.user.email || 'Your account'} />
   </>;
-  const title = mode === 'signup' ? 'Create your account' : mode === 'reset' ? 'Reset your password' : mode === 'update' ? 'Choose a new password' : 'Sign in to Mylekhpal';
+  const roleLabel = requestedRole === 'owner' ? 'Business Owner' : requestedRole === 'ca_partner' ? 'Chartered Accountant' : requestedRole === 'accountant' ? 'Accountant / Bookkeeper' : '';
+  const title = mode === 'signup' ? `Create your ${roleLabel || 'Mylekhpal'} account` : mode === 'reset' ? 'Reset your password' : mode === 'update' ? 'Choose a new password' : roleLabel ? `Sign in as ${roleLabel}` : 'Sign in to Mylekhpal';
   return <main className="wrap" style={{ maxWidth: 520, paddingTop: 60, paddingBottom: 60 }}>
     <a href="/" className="brand">mylekhpal<span className="brand-dot">.</span></a>
     <h1 style={{ fontSize: '2rem', marginTop: 32 }}>{title}</h1>

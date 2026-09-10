@@ -494,6 +494,35 @@ h2 {
   color: #163b2f;
   margin-top: 12px;
 }
+.compliance-notice {
+  border-top: 1px solid #dfe7e3;
+}
+.compliance-notice > p {
+  max-width: 900px;
+  color: #566b63;
+  font-size: 16px;
+  line-height: 1.75;
+}
+.compliance-notice a {
+  color: #126f54;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.compliance-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  margin: 28px 0;
+}
+.compliance-grid article {
+  border: 1px solid #dce7e1;
+  border-radius: 10px;
+  padding: 19px;
+  display: grid;
+  gap: 8px;
+}
+.compliance-grid b { color: #173f36; font-size: 15px; }
+.compliance-grid span { color: #5f736b; font-size: 14px; line-height: 1.6; }
 .collab {
   align-self: center;
   text-align: center;
@@ -508,6 +537,21 @@ h2 {
   padding: 22px;
   border-radius: 12px;
 }
+.collab .role-card {
+  display: grid;
+  grid-template-columns: 45px 1fr;
+  gap: 4px 12px;
+  text-align: left;
+  border: 1px solid #46605a;
+  background: #ffffff07;
+  padding: 22px;
+  border-radius: 12px;
+  color: white;
+  text-decoration: none;
+}
+.role-card:hover { background: #ffffff13; border-color: #a9d797; }
+.role-card em { grid-column: 2; color: #d5efab; font-size: 12px; font-style: normal; font-weight: 700; margin-top: 5px; }
+.avatar.bookkeeper { background: #f6d79a; }
 .avatar {
   grid-row: span 2;
   background: #d5efab;
@@ -668,6 +712,7 @@ footer small {
     grid-template-columns: 1fr;
     gap: 14px;
   }
+  .compliance-grid { grid-template-columns: 1fr; }
   .steps article {
     padding: 24px;
   }
