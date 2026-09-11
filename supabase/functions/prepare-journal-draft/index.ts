@@ -1,12 +1,13 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import * as XLSX from 'npm:xlsx@0.18.5';
 import { SKILL_PACKAGE } from './skill-package.ts';
+import { runProgressiveSkillAgent, type SkillRepository } from '../_shared/progressive-skill-agent.ts';
 
 type DraftInput = { businessId: string; sourceMethod: string; manualText?: string; file?: { name: string; type: string; base64: string } };
 type Account = { id: string; code: string; name: string; type: string };
 const headers = { 'content-type': 'application/json', 'cache-control': 'no-store' };
-const respond = (body: unknown, status = 200, requestId?: string) => new Response(JSON.stringify(body), { status, headers: { ...headers, ...(requestId ? { 'x-mylekhpal-request-id': requestId } : {}) } });
-const permittedOrigin = (req: Request) => !req.headers.get('origin') || ['https://mylekhpal.com', 'https://www.mylekhpal.com', 'http://localhost:5173'].includes(req.headers.get('origin')!);
+const origins = new Set(['https://mylekhpal.com', 'https://www.mylekhpal.com', 'http://localhost:5173']);
+const respond = (body: unknown, status = 200, requestId?: string, origin?: string | null) => new Response(JSON.stringify(body), { status, headers: { ...headers, ...(origin && origins.has(origin) ? { 'access-control-allow-origin': origin, vary: 'origin' } : {}), ...(requestId ? { 'x-mylekhpal-request-id': requestId } : {}) } });
 const hash = async (text: string) => Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text)))).map((x) => x.toString(16).padStart(2, '0')).join('');
 
 function contentFor(file?: DraftInput['file']) {
@@ -22,15 +23,15 @@ function contentFor(file?: DraftInput['file']) {
   throw new Error('Use a PDF, image, CSV, XLS or XLSX file.');
 }
 
-function runtimeInstructions(accounts: Account[], business: Record<string, unknown>, duplicateSource: boolean) {
-  const references = Object.entries(SKILL_PACKAGE.references).map(([name, text]) => `\n\n===== ${name} =====\n${text}`).join('');
-  return `${SKILL_PACKAGE.skill}${references}
-
-===== MYLEKHAPAL RUNTIME BOUNDARIES (take precedence where implementation differs) =====
-You are executing the exact ${SKILL_PACKAGE.name} guidance in an authenticated MyLekhapal workflow. Prepare ONE reviewable DRAFT only. Do not post, approve, delete, edit a finalized record, create a ledger, file a return, claim a live reconciliation, or claim a Google Drive upload.
-Use only facts supported by the source. If absent, mark it missing and add a clarification; do not guess. The application, not you, enforces permissions, financial-period locks, voucher numbering, storage, and final saving.
-Business context: ${JSON.stringify(business)}. The only permitted account IDs are ${JSON.stringify(accounts)}. Select only those accounts. ${duplicateSource ? 'An identical source-file hash already exists: flag a possible duplicate.' : 'No matching source-file hash was found; that is not proof that no duplicate entry exists.'}
-The application cannot run the skill's Python workbook script inside this Edge Function. Do not claim an XLSX workbook was created. Return the complete structured draft required by the tool schema. The user must review and explicitly save it; every response is a draft pending qualified accounting review.`;
+function journalSkillRepository(): SkillRepository {
+  const base = '/skills/my-journal-entry-preparation';
+  return {
+    name: SKILL_PACKAGE.name,
+    description: 'Prepare reviewable business-accounting journal drafts from transactions and accounting documents; includes GST/TDS and CA-review workflow support.',
+    skillPath: `${base}/SKILL.md`, loadSkill: async () => SKILL_PACKAGE.skill,
+    references: Object.fromEntries(Object.entries(SKILL_PACKAGE.references).map(([path, content]) => [`${base}/${path}`, async () => content])),
+    resources: { [`${base}/scripts/build_journal_entry.py`]: { kind: 'script', available: true, note: 'Approved workbook builder. It is queued to the isolated report-job worker; the Edge agent cannot execute arbitrary shell commands.' } },
+  };
 }
 
 const draftSchema = {
@@ -47,41 +48,45 @@ const draftSchema = {
 };
 
 Deno.serve(async (req) => {
-  if (req.method !== 'POST') return respond({ error: 'Method not allowed.' }, 405);
-  if (!permittedOrigin(req)) return respond({ error: 'Request origin rejected.' }, 403);
+  const origin = req.headers.get('origin');
+  if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: origin && origins.has(origin) ? { 'access-control-allow-origin': origin, 'access-control-allow-headers': 'authorization, content-type', 'access-control-allow-methods': 'POST, OPTIONS', vary: 'origin' } : {} });
+  if (req.method !== 'POST') return respond({ error: 'Method not allowed.' }, 405, undefined, origin);
+  if (origin && !origins.has(origin)) return respond({ error: 'Request origin rejected.' }, 403, undefined, origin);
   try {
     const authorization = req.headers.get('authorization');
-    if (!authorization) return respond({ error: 'Sign in to continue.' }, 401);
+    if (!authorization) return respond({ error: 'Sign in to continue.' }, 401, undefined, origin);
     const input = await req.json() as DraftInput;
-    if (!input.businessId || (!input.manualText && !input.file)) return respond({ error: 'A business and transaction text or document are required.' }, 400);
-    if (input.file && input.file.base64.length > 7_000_000) return respond({ error: 'Maximum file size is 5 MB.' }, 413);
+    if (!input.businessId || (!input.manualText && !input.file)) return respond({ error: 'A business and transaction text or document are required.' }, 400, undefined, origin);
+    if (input.file && input.file.base64.length > 7_000_000) return respond({ error: 'Maximum file size is 5 MB.' }, 413, undefined, origin);
     const url = Deno.env.get('SUPABASE_URL')!, anon = Deno.env.get('SUPABASE_ANON_KEY')!, service = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const userDb = createClient(url, anon, { global: { headers: { authorization } } });
     const { data: { user } } = await userDb.auth.getUser();
-    if (!user) return respond({ error: 'Sign in to continue.' }, 401);
+    if (!user) return respond({ error: 'Sign in to continue.' }, 401, undefined, origin);
     const { data: member } = await userDb.from('business_memberships').select('role').eq('business_id', input.businessId).eq('user_id', user.id).eq('status', 'active').maybeSingle();
-    if (!member || member.role === 'auditor') return respond({ error: 'Your role cannot prepare drafts.' }, 403);
+    if (!member || member.role === 'auditor') return respond({ error: 'Your role cannot prepare drafts.' }, 403, undefined, origin);
+    const { data: writeAllowed } = await userDb.rpc('mylekhpal_write_access', { target_business: input.businessId });
+    if (!writeAllowed) return respond({ error: 'This workspace is currently read-only. You can still view and download your records.' }, 403, undefined, origin);
     const [{ data: accounts }, { data: business }] = await Promise.all([
       userDb.from('chart_of_accounts').select('id,code,name,type').eq('business_id', input.businessId).eq('is_active', true),
       userDb.from('businesses').select('legal_name,display_name,pan,gstins,workspace_settings').eq('id', input.businessId).single(),
     ]);
-    if (!accounts?.length || !business) return respond({ error: 'The active business or its chart of accounts is unavailable.' }, 422);
+    if (!accounts?.length || !business) return respond({ error: 'The active business or its chart of accounts is unavailable.' }, 422, undefined, origin);
     const admin = createClient(url, service), sourceHash = await hash(input.file?.base64 || input.manualText || '');
     const { data: matchingSource } = await admin.from('source_documents').select('id').eq('business_id', input.businessId).eq('file_hash', sourceHash).limit(1).maybeSingle();
-    const api = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST', headers: { 'content-type': 'application/json', 'x-api-key': Deno.env.get('MYLEKHAPAL_ANTHROPIC_API_KEY')!, 'anthropic-version': '2023-06-01' },
-      body: JSON.stringify({ model: Deno.env.get('MYLEKHAPAL_ANTHROPIC_MODEL') || 'claude-sonnet-4-6', max_tokens: 3500, system: runtimeInstructions(accounts, business, Boolean(matchingSource)), messages: [{ role: 'user', content: [...contentFor(input.file), { type: 'text', text: `Source method: ${input.sourceMethod}. Manual context: ${input.manualText || '(none)'}. Prepare the journal draft now.` }] }], tools: [{ name: 'prepare_journal_draft', description: 'Return one reviewable accounting draft only.', input_schema: draftSchema }], tool_choice: { type: 'tool', name: 'prepare_journal_draft' } }),
+    const agent = await runProgressiveSkillAgent({
+      repository: journalSkillRepository(), model: Deno.env.get('MYLEKHAPAL_ANTHROPIC_MODEL') || 'claude-sonnet-4-6', apiKey: Deno.env.get('MYLEKHAPAL_ANTHROPIC_API_KEY')!, maxTokens: 3500,
+      runtimeContext: `Prepare one reviewable journal DRAFT only. Do not post, approve, delete, edit a finalised record, file a return, or claim a Google Drive upload. Use only source facts; missing facts must be clarifications. The application enforces permissions, locks, voucher numbering and saving. Business context: ${JSON.stringify(business)}. Allowed accounts: ${JSON.stringify(accounts)}. ${matchingSource ? 'An identical source hash exists; flag a possible duplicate.' : 'No source-hash match was found; that is not proof there is no duplicate.'} The Python workbook resource is available only to the isolated report-job worker; do not claim an XLSX was created in this request.`,
+      userContent: [...contentFor(input.file), { type: 'text', text: `Source method: ${input.sourceMethod}. Manual context: ${input.manualText || '(none)'}. Prepare the journal draft now.` }],
+      finalToolName: 'prepare_journal_draft', finalToolDescription: 'Return one reviewable accounting draft only.', finalToolSchema: draftSchema,
     });
-    const requestId = api.headers.get('request-id') || crypto.randomUUID(), result = await api.json();
-    if (!api.ok) return respond({ error: 'Journal draft preparation is temporarily unavailable.', requestId }, 502, requestId);
-    const draft = result.content?.find((b: { type: string }) => b.type === 'tool_use')?.input;
+    const requestId = agent.requestId, draft = agent.draft;
     if (!draft?.lines?.length) return respond({ error: 'No valid journal draft was returned.', requestId }, 502, requestId);
     const accountIds = new Set(accounts.map((a) => a.id));
     const debit = draft.lines.reduce((n: number, x: { debit?: number }) => n + Number(x.debit || 0), 0), credit = draft.lines.reduce((n: number, x: { credit?: number }) => n + Number(x.credit || 0), 0);
-    if (draft.lines.some((x: { account_id: string; debit?: number; credit?: number }) => !accountIds.has(x.account_id) || (Number(x.debit || 0) > 0) === (Number(x.credit || 0) > 0)) || Math.abs(debit - credit) > 0.01) return respond({ error: 'The proposed draft did not pass account or balance validation.', requestId }, 422, requestId);
+    if (draft.lines.some((x: { account_id: string; debit?: number; credit?: number }) => !accountIds.has(x.account_id) || (Number(x.debit || 0) > 0) === (Number(x.credit || 0) > 0)) || Math.abs(debit - credit) > 0.01) return respond({ error: 'The proposed draft did not pass account or balance validation.', requestId }, 422, requestId, origin);
     const { data: doc, error } = await admin.from('source_documents').insert({ business_id: input.businessId, doc_type: input.sourceMethod, storage_provider: 'ephemeral_processed_only', file_name: input.file?.name || 'manual-entry.txt', file_hash: sourceHash, extracted_fields: draft, ocr_confidence: draft.confidence, uploaded_by: user.id }).select('id').single();
     if (error) throw new Error('Could not record the processed source.');
-    await admin.from('usage_records').insert([{ business_id: input.businessId, user_id: user.id, event_type: 'ai_document_processed', quantity: 1, estimated_cost: 0 }, { business_id: input.businessId, user_id: user.id, event_type: 'ai_tokens', quantity: Number(result.usage?.input_tokens || 0) + Number(result.usage?.output_tokens || 0), estimated_cost: 0 }]);
+    await admin.from('usage_records').insert([{ business_id: input.businessId, user_id: user.id, event_type: 'ai_document_processed', quantity: 1, estimated_cost: 0 }, { business_id: input.businessId, user_id: user.id, event_type: 'ai_tokens', quantity: agent.inputTokens + agent.outputTokens, estimated_cost: 0 }]);
     const skillAudit = {
       name: 'my-journal-entry-preparation',
       retained_skill_name: SKILL_PACKAGE.manifest.retained_skill_name,
@@ -90,7 +95,8 @@ Deno.serve(async (req) => {
       package_content_sha256: SKILL_PACKAGE.packageHash,
       provenance_note: 'The consolidated SKILL.md is the retained runtime skill. journal-entry-preparation is superseded provenance only for copied scripts and references.',
     };
-    await admin.from('audit_log').insert({ business_id: input.businessId, actor_user_id: user.id, actor_type: 'ai_draft', action: 'claude_journal_draft_prepared', entity_type: 'source_document', entity_id: doc.id, after_state: { request_id: requestId, model: result.model, source_method: input.sourceMethod, skill: skillAudit, source_hash_duplicate: Boolean(matchingSource) } });
-    return respond({ draft, requestId, model: result.model, sourceDocumentId: doc.id, skill: skillAudit }, 200, requestId);
-  } catch (e) { return respond({ error: e instanceof Error ? e.message : 'Unable to prepare draft.' }, 500); }
+    await admin.from('audit_log').insert({ business_id: input.businessId, actor_user_id: user.id, actor_type: 'ai_draft', action: 'claude_journal_draft_prepared', entity_type: 'source_document', entity_id: doc.id, after_state: { request_id: requestId, model: agent.model, source_method: input.sourceMethod, skill: skillAudit, source_hash_duplicate: Boolean(matchingSource), progressive_agent: { skill_loaded: agent.skillLoaded, references_loaded: agent.referencesLoaded, tool_calls: agent.toolCalls, input_tokens: agent.inputTokens, output_tokens: agent.outputTokens } } });
+    await admin.from('private.skill_agent_runs').insert({ request_id: requestId, service: 'business_accounting', skill_name: SKILL_PACKAGE.name, skill_path: '/skills/my-journal-entry-preparation/SKILL.md', skill_loaded: agent.skillLoaded, references_loaded: agent.referencesLoaded, tool_calls: agent.toolCalls, model: agent.model, input_tokens: agent.inputTokens, output_tokens: agent.outputTokens, status: 'completed', business_id: input.businessId });
+    return respond({ draft, requestId, sourceDocumentId: doc.id }, 200, requestId, origin);
+  } catch (_e) { return respond({ error: 'Unable to prepare the journal draft. Please retry shortly.' }, 500, undefined, origin); }
 });
