@@ -11,9 +11,18 @@ test('both service endpoints use the controlled progressive skill runner', async
   for (const endpoint of ['prepare-journal-draft/index.ts', 'prepare-personal-finance-draft/index.ts']) {
     const source = await read(`supabase/functions/${endpoint}`);
     assert.match(source, /runProgressiveSkillAgent/);
-    assert.match(source, /loadSkill/);
-    assert.match(source, /references:/);
+    assert.match(source, /repositoryFor\(/);
   }
+});
+
+test('authoritative skill packages are dynamically discovered into the runtime registry', async () => {
+  const generator = await read('scripts/generate-skill-registry.mjs');
+  const registry = await read('supabase/functions/_shared/generated-skill-registry.ts');
+  assert.match(generator, /skillsRoot/);
+  assert.match(generator, /No SKILL\.md found/);
+  assert.match(registry, /my-journal-entry-preparation/);
+  assert.match(registry, /mylekhpal-personal-finance-tax-support/);
+  assert.match(registry, /build_journal_entry\.py/);
 });
 
 test('agent forces complete skill loading before it accepts a draft', async () => {

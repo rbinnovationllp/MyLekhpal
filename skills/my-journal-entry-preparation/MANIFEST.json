@@ -1,0 +1,44 @@
+{
+  "package": "my-journal-entry-preparation",
+  "files": {
+    "my-journal-entry-preparation/SKILL.md": {
+      "sha256": "567111f6d31caa5efed35b964f0109730b0b83fb19e69ff700e7100a72d4fa0d",
+      "bytes": 22088
+    },
+    "my-journal-entry-preparation/references/review-and-risk.md": {
+      "sha256": "8e7e059fe2e014fa3b32cac3dc89867e47c3694936b31a98f70dd6db84adf61b",
+      "bytes": 5510
+    },
+    "my-journal-entry-preparation/references/multi-client-management.md": {
+      "sha256": "6127f7fed5ca05c8b7ba87e931ca266158a978702b69a07ad5113ce30ebb8ae4",
+      "bytes": 6751
+    },
+    "my-journal-entry-preparation/references/accrual-types-and-templates.md": {
+      "sha256": "d2c47dfb4cec71f8a5af4f9512550cf552a7a6c0e84c60dcba2e66b8f9738299",
+      "bytes": 5595
+    },
+    "my-journal-entry-preparation/references/india-tax.md": {
+      "sha256": "6f397ad823c22b9e6bb0e6c7d8cc835d15a0ed0c459c23d91a76ea409c58e7d5",
+      "bytes": 2884
+    },
+    "my-journal-entry-preparation/references/confidence-and-corrections.md": {
+      "sha256": "a6446a6e35dccc7ff6b97d2d9865384ed8aec9433203338cb875f532e9d116d8",
+      "bytes": 3363
+    },
+    "my-journal-entry-preparation/references/mandatory-requirements-checklist.md": {
+      "sha256": "840a7dccd102bd5692cae940c97d02f1f01101c80cde83548ff44ae15b3d48f5",
+      "bytes": 6139
+    },
+    "my-journal-entry-preparation/scripts/build_journal_entry.py": {
+      "sha256": "35f3ae6e4a0bee6d112d78cec22cfd8f3650c73c7bce26362c408b96452e0408",
+      "bytes": 48447
+    }
+  },
+  "retained_skill_name": "my-journal-entry-preparation",
+  "provenance": {
+    "my-journal-entry-preparation/SKILL.md": "Consolidated by Claude in this session \u2014 merges the original my-journal-entry-preparation product-spec content with the operational mechanics below.",
+    "my-journal-entry-preparation/scripts/build_journal_entry.py": "Unmodified copy, originally located in the separate (now-superseded) 'journal-entry-preparation' skill folder. Copied here as part of consolidation; not authored fresh.",
+    "my-journal-entry-preparation/references/*": "Unmodified copies, originally located in the separate (now-superseded) 'journal-entry-preparation' skill folder. Copied here as part of consolidation; not authored fresh."
+  },
+  "superseded_duplicate_skill": "journal-entry-preparation (source of scripts/ and references/ only -- to be retired once this package is confirmed working)"
+}

@@ -21,3 +21,22 @@ export async function prepareJournalDraft(payload: unknown) {
   if (data?.error) throw new Error(data.error);
   return data;
 }
+
+export async function personalFinanceRequest(payload: unknown) {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session?.access_token) throw new Error('Your sign-in session has expired. Please sign in again.');
+  const body = typeof payload === 'object' && payload !== null ? { ...payload as Record<string, unknown>, accessToken: session.access_token } : payload;
+  const { data, error } = await supabase.functions.invoke('prepare-personal-finance-draft', { body, headers: { Authorization: `Bearer ${session.access_token}` } });
+  if (error) throw new Error(error.message || 'Personal Finance & Tax Support is unavailable.');
+  if (data?.error) throw new Error(data.error);
+  return data;
+}
+
+export async function startPersonalSubscription(householdId: string, planCode: string) {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session?.access_token) throw new Error('Your sign-in session has expired. Please sign in again.');
+  const { data, error } = await supabase.functions.invoke('create-razorpay-personal-subscription', { body: { householdId, planCode, accessToken: session.access_token }, headers: { Authorization: `Bearer ${session.access_token}` } });
+  if (error) throw new Error(error.message || 'Unable to start secure payment authorisation.');
+  if (data?.error || !data?.shortUrl) throw new Error(data?.error || 'Unable to start secure payment authorisation.');
+  window.location.assign(data.shortUrl);
+}

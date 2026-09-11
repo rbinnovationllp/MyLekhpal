@@ -1,0 +1,172 @@
+# OpenAI-compatible agent/function-calling mapping for
+# mylekhpal-personal-finance-tax-support
+#
+# This file lets a non-Claude, OpenAI-Assistants/Responses-API-style runtime
+# integrate this skill's behaviour as a system prompt + tool schema. Claude-based
+# integrations should use SKILL.md and references/ directly instead of this file.
+
+skill: mylekhpal-personal-finance-tax-support
+version: 1.0.0
+
+system_prompt: >
+  You are MyLekhapal's Personal Finance & Tax Support assistant for individual
+  and household users in India. You help with household budgeting, bank
+  statement analysis, liability tracking, financial-goal and retirement
+  planning, general savings education, and intake coordination for ITR, GST,
+  and departmental matters. You never file returns, never submit anything to
+  a government portal, never give personalised or product-specific investment
+  advice, and never request passwords, OTPs, PINs, or CVVs. You always produce
+  reviewable structured drafts, never take irreversible actions, and always
+  route filings, formal replies, and product-specific advice to a verified
+  professional after explicit user consent. Follow the mode-specific
+  instructions provided in the accompanying reference documents, and always
+  emit output conforming to the shared JSON schemas provided.
+
+modes:
+  - id: household_budget_planner
+    reference: references/household-budgeting.md
+  - id: past_expenditure_analysis
+    reference: references/bank-statement-analysis.md
+  - id: multi_bank_overview
+    reference: references/bank-statement-analysis.md
+  - id: liability_debt_planner
+    reference: references/liabilities-and-goals.md
+  - id: future_goal_planner
+    reference: references/liabilities-and-goals.md
+  - id: retirement_planner
+    reference: references/retirement-planning.md
+  - id: savings_education
+    reference: references/regulated-advice-boundaries.md
+  - id: itr_gst_intake
+    reference: references/tax-service-intake.md
+  - id: departmental_matters
+    reference: references/tax-service-intake.md
+
+tools:
+  - type: function
+    function:
+      name: extract_bank_statement
+      description: >
+        Extract normalized transactions from an uploaded bank statement
+        (PDF, CSV, or Excel). Returns transactions with date, description,
+        amount, direction, and running balance. Does not touch live banking
+        credentials — operates only on the uploaded file.
+      parameters:
+        type: object
+        properties:
+          document_ref:
+            type: string
+            description: Backend-issued reference ID for the uploaded statement.
+          bank_name:
+            type: string
+        required: [document_ref]
+
+  - type: function
+    function:
+      name: categorize_transaction
+      description: >
+        Suggest a category for a normalized transaction. Must return
+        user_confirmed=false until the user explicitly confirms.
+      parameters:
+        type: object
+        properties:
+          transaction_id:
+            type: string
+          candidate_categories:
+            type: array
+            items:
+              type: string
+              enum:
+                - essential
+                - contractual_unavoidable
+                - important_adjustable
+                - discretionary
+                - unclassified
+        required: [transaction_id, candidate_categories]
+
+  - type: function
+    function:
+      name: compute_budget
+      description: Compute a monthly household budget from declared income and expenses.
+      parameters:
+        type: object
+        properties:
+          income_total:
+            type: number
+          categories:
+            type: array
+            items:
+              type: object
+              properties:
+                name: { type: string }
+                limit: { type: number }
+        required: [income_total, categories]
+
+  - type: function
+    function:
+      name: compute_goal_projection
+      description: >
+        Compute inflation-adjusted cost, funding gap, and monthly savings
+        required for a financial goal. All outputs must be labeled as
+        estimates, never guarantees.
+      parameters:
+        type: object
+        properties:
+          goal_type: { type: string }
+          present_cost: { type: number }
+          target_date: { type: string, format: date }
+          inflation_assumption_pct: { type: number }
+          existing_amount: { type: number }
+        required: [goal_type, present_cost, target_date, existing_amount]
+
+  - type: function
+    function:
+      name: compute_retirement_projection
+      description: >
+        Compute conservative, balanced, and stress-test retirement corpus and
+        savings-requirement scenarios. Never returns a single guaranteed figure.
+      parameters:
+        type: object
+        properties:
+          current_age: { type: integer }
+          retirement_age: { type: integer }
+          current_monthly_expenditure: { type: number }
+          inflation_assumption_pct: { type: number }
+          existing_retirement_savings: { type: number }
+        required: [current_age, retirement_age, current_monthly_expenditure]
+
+  - type: function
+    function:
+      name: create_professional_referral
+      description: >
+        Create a time-limited, scoped professional-referral engagement record.
+        Requires explicit client consent scope before any document is shared.
+        Never call this to actually file, submit, or sign anything — it only
+        creates the referral/engagement record for backend handling.
+      parameters:
+        type: object
+        properties:
+          professional_type:
+            type: string
+            enum:
+              - Chartered Accountant
+              - SEBI-Registered Investment Adviser
+              - Legal Professional
+              - Financial Counsellor
+          case_summary: { type: string }
+          consent_scope:
+            type: array
+            items: { type: string }
+          client_approval_obtained: { type: boolean }
+        required: [professional_type, case_summary, consent_scope, client_approval_obtained]
+
+blocked_terms_never_request:
+  - internet_banking_password
+  - otp
+  - upi_pin
+  - cvv
+  - full_card_number
+  - government_portal_password
+  - api_key_or_oauth_secret
+
+output_schema_ref: references/output-schemas.md

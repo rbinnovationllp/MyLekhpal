@@ -2,9 +2,11 @@ import { useEffect, useState } from 'react';
 import type { Session } from '@supabase/supabase-js';
 import { supabase } from './supabase';
 import Workspace from '../app/workspace/workspace';
+import PersonalWorkspace from '../app/personal-workspace';
 
 export default function Account() {
   const requestedRole = new URLSearchParams(window.location.search).get('role');
+  const selectedService = window.location.pathname === '/personal' || new URLSearchParams(window.location.search).get('service') === 'personal' ? 'personal' : 'business';
   const [session, setSession] = useState<Session | null>(null);
   const [ready, setReady] = useState(false);
   const [mode, setMode] = useState<'signin' | 'signup' | 'reset' | 'update'>('signin');
@@ -30,7 +32,7 @@ export default function Account() {
     const email = String(form.get('email') || '').trim();
     const password = String(form.get('password') || '');
     try {
-      const redirectTo = `${window.location.origin}/workspace`;
+      const redirectTo = `${window.location.origin}${selectedService === 'personal' ? '/personal' : '/workspace'}`;
       if (mode === 'reset') {
         const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo });
         if (error) throw error;
@@ -61,7 +63,7 @@ export default function Account() {
       }}>Sign out</button>
       {error && <p role="alert">{error}</p>}
     </div>
-    <Workspace key={session.user.id} user={session.user.email || 'Your account'} />
+    {selectedService === 'personal' ? <PersonalWorkspace key={session.user.id} /> : <Workspace key={session.user.id} user={session.user.email || 'Your account'} />}
   </>;
   const roleLabel = requestedRole === 'owner' ? 'Business Owner' : requestedRole === 'ca_partner' ? 'Chartered Accountant' : requestedRole === 'accountant' ? 'Accountant / Bookkeeper' : '';
   const title = mode === 'signup' ? `Create your ${roleLabel || 'Mylekhpal'} account` : mode === 'reset' ? 'Reset your password' : mode === 'update' ? 'Choose a new password' : roleLabel ? `Sign in as ${roleLabel}` : 'Sign in to Mylekhpal';

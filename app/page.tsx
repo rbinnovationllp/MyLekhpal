@@ -56,10 +56,14 @@ export default function Home() {
             <a href="/workspace" className="button">
               Set up your business <ArrowUpRight size={19} />
             </a>
-            <a href="#preview" className="textlink">
-              Explore the workspace <ArrowRight size={18} />
+            <a href="/workspace?role=owner" className="textlink">
+              Open your workspace <ArrowRight size={18} />
             </a>
           </div>
+          <p className="helper" style={{ marginTop: 18 }}>
+            Looking after your household finances?{' '}
+            <a href="/personal" className="textlink">Open Personal Finance &amp; Tax Support <ArrowRight size={18} /></a>
+          </p>
           <div className="hero-notes">
             <span>
               <Check size={16} /> Made for Indian businesses
