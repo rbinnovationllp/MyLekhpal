@@ -30,6 +30,7 @@ export default function Home() {
         <div className="navlinks">
           <a href="#workflow">How it works</a>
           <a href="#together">For businesses & CAs</a>
+          <a href="/personal">Personal Finance</a>
           <a href="/workspace">Workspace</a>
         </div>
         <a className="button small" href="/workspace">
@@ -56,14 +57,10 @@ export default function Home() {
             <a href="/workspace" className="button">
               Set up your business <ArrowUpRight size={19} />
             </a>
-            <a href="/workspace?role=owner" className="textlink">
-              Open your workspace <ArrowRight size={18} />
+            <a href="/personal" className="button personal-cta">
+              Personal Finance &amp; Tax Support <ArrowRight size={18} />
             </a>
           </div>
-          <p className="helper" style={{ marginTop: 18 }}>
-            Looking after your household finances?{' '}
-            <a href="/personal" className="textlink">Open Personal Finance &amp; Tax Support <ArrowRight size={18} /></a>
-          </p>
           <div className="hero-notes">
             <span>
               <Check size={16} /> Made for Indian businesses

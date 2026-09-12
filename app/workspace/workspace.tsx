@@ -281,9 +281,9 @@ export default function Workspace({ user }: { user: string }) {
   async function readImport(file: File) {
     setImportFile(file);
     const image = file.type.startsWith('image/');
-    const spreadsheet = file.name.toLowerCase().endsWith('.csv') || file.type.includes('csv');
-    const base: ImportResult = { name: file.name, kind: image ? 'image' : spreadsheet ? 'spreadsheet' : 'document', preview: image ? URL.createObjectURL(file) : undefined, date: '', reference: '', party: '', description: '', taxableAmount: '', gst: '', total: '', missing: ['Transaction date', 'Reference number', 'Party', 'Amount'] };
-    if (spreadsheet) {
+    const spreadsheet = /\.(csv|xlsx?|xls)$/i.test(file.name) || file.type.includes('csv') || file.type.includes('spreadsheet') || file.type.includes('excel');
+    const base: ImportResult = { name: file.name, kind: image ? 'image' : spreadsheet ? 'spreadsheet' : 'document', preview: image ? URL.createObjectURL(file) : undefined, date: '', reference: '', party: '', description: '', taxableAmount: '', gst: '', total: '', missing: [] };
+    if (file.name.toLowerCase().endsWith('.csv') || file.type.includes('csv')) {
       const rows = (await file.text()).split(/\r?\n/).filter(Boolean).map(csvRow);
       const headers = rows[0]?.map((x) => x.toLowerCase().replace(/[^a-z0-9]/g, '')) || [];
       const row = rows[1] || [];
@@ -296,7 +296,7 @@ export default function Workspace({ user }: { user: string }) {
       base.gst = field('gst', 'tax');
       base.total = field('total', 'grandtotal', 'amount') || base.taxableAmount;
       base.missing = [['Transaction date', base.date], ['Reference number', base.reference], ['Party', base.party], ['Amount', base.total]].filter(([, value]) => !value).map(([label]) => label as string);
-    } else {
+    } else if (!spreadsheet) {
       base.description = image ? 'Photo captured for review' : 'Document uploaded for review';
       base.missing = ['Transaction date', 'Reference number', 'Party', 'Taxable amount', 'GST', 'Total amount'];
     }
@@ -314,7 +314,7 @@ export default function Workspace({ user }: { user: string }) {
       setAiDraft({ ...draft, model: result.model, requestId: result.requestId, skill: result.skill });
       setImported((current) => current ? { ...current, date: draft.transaction_date || '', reference: draft.reference || '', party: draft.party_name || '', description: draft.narration || current.description, taxableAmount: draft.taxable_amount == null ? '' : String(draft.taxable_amount), gst: draft.gst_amount == null ? '' : String(draft.gst_amount), total: draft.total_amount == null ? '' : String(draft.total_amount), missing: (draft.completeness || []).filter((item: any) => ['missing', 'invalid', 'inconsistent', 'pending_professional_review'].includes(item.status)).map((item: any) => item.field) } : current);
       setNotice(t(`MyLekhapal Intelligence prepared a ${draft.status} draft. Review required before saving.`, `MyLekhapal Intelligence ने ${draft.status} ड्राफ्ट तैयार किया। सहेजने से पहले समीक्षा आवश्यक है।`));
-    } catch { setError(t('We could not prepare a journal draft. Please try again.', 'जर्नल ड्राफ्ट तैयार नहीं हो सका। कृपया पुनः प्रयास करें।')); }
+    } catch (reason: any) { setError(reason?.message || t('We could not prepare a journal draft. Please try again.', 'जर्नल ड्राफ्ट तैयार नहीं हो सका। कृपया पुनः प्रयास करें।')); }
     finally { setAiBusy(false); }
   }
   function exportCsv() {
@@ -951,10 +951,14 @@ export default function Workspace({ user }: { user: string }) {
                     </label>
                     <button
                       className="button"
-                      disabled={busy || !confirmBusiness}
+                      disabled={busy || aiBusy || !confirmBusiness || Boolean(importFile && !aiDraft)}
                     >
                       {busy
                         ? t('Saving…', 'सहेज रहे हैं…')
+                        : aiBusy
+                          ? t('Preparing your journal draft…', 'आपका जर्नल ड्राफ्ट तैयार हो रहा है…')
+                        : importFile && !aiDraft
+                          ? t('Waiting for journal analysis…', 'जर्नल विश्लेषण की प्रतीक्षा है…')
                         : t('Save balanced draft', 'संतुलित ड्राफ्ट सहेजें')}
                     </button>
                   </form>

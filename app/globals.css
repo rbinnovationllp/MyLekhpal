@@ -170,6 +170,14 @@ h1 > span {
   align-items: center;
   margin-top: 30px;
 }
+.personal-cta {
+  background: #e9f7c9;
+  color: #123f36;
+  border: 1px solid #b8d987;
+}
+.personal-cta:hover {
+  background: #d8efab;
+}
 .textlink {
   display: flex;
   align-items: center;
