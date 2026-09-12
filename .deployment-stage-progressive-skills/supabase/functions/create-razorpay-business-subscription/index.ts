@@ -40,7 +40,10 @@ Deno.serve(async (req) => {
     if (current.razorpay_subscription_id && current.status !== 'cancelled' && current.status !== 'expired') return reply({ error: 'A business plan is already awaiting authorisation or active.' }, 409, origin);
     const startAt = timestamp(Math.max(Math.floor(Date.now() / 1000), Math.floor(new Date(current.trial_ends_at).valueOf() / 1000)));
     const expireBy = timestamp(startAt + 24 * 60 * 60);
-    const response = await fetch('https://api.razorpay.com/v1/subscriptions', { method: 'POST', headers: { authorization: `Basic ${btoa(`${keyId}:${keySecret}`)}`, 'content-type': 'application/json' }, body: JSON.stringify({ plan_id: plan.razorpay_plan_id, quantity: 1, total_count: plan.interval === 'yearly' ? 100 : 1200, customer_notify: true, start_at: startAt, expire_by: expireBy, notes: { service: 'business_accounting', business_id: input.businessId, plan_code: plan.code } }) });
+    // Razorpay derives the UPI mandate end_time from this value. A 100-year
+    // subscription can exceed Razorpay's 2121 timestamp ceiling and makes
+    // the QR refresh fail. Sixty years remains long-running and in range.
+    const response = await fetch('https://api.razorpay.com/v1/subscriptions', { method: 'POST', headers: { authorization: `Basic ${btoa(`${keyId}:${keySecret}`)}`, 'content-type': 'application/json' }, body: JSON.stringify({ plan_id: plan.razorpay_plan_id, quantity: 1, total_count: plan.interval === 'yearly' ? 60 : 720, customer_notify: true, start_at: startAt, expire_by: expireBy, notes: { service: 'business_accounting', business_id: input.businessId, plan_code: plan.code } }) });
     const provider = await response.json().catch(() => ({}));
     if (!response.ok || !provider?.id || !provider?.short_url) {
       console.error('business_subscription_provider_rejected', { status: response.status, providerCode: provider?.error?.code, providerReason: provider?.error?.reason, providerDescription: provider?.error?.description, startAt, expireBy });
@@ -55,4 +58,3 @@ Deno.serve(async (req) => {
     return reply({ error: 'Unable to begin secure business-plan authorisation. Please retry shortly.' }, 500, origin);
   }
 });
-
