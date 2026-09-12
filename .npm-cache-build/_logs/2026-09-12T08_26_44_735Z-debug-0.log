@@ -1,0 +1,254 @@
+0 verbose cli C:\Program Files\nodejs\node.exe C:\Users\HP\AppData\Roaming\npm\node_modules\npm\bin\npm-cli.js
+1 info using npm@11.13.0
+2 info using node@v22.20.0
+3 silly config load:file:C:\Users\HP\AppData\Roaming\npm\node_modules\npm\npmrc
+4 silly config load:file:C:\Users\HP\install-this-skill\outputs\mylekhpal\.npmrc
+5 silly config load:file:C:\Users\HP\.npmrc
+6 silly config load:file:C:\Users\HP\AppData\Roaming\npm\etc\npmrc
+7 verbose title npm install
+8 verbose argv "install" "--include" "dev" "--ignore-scripts" "--no-audit" "--no-fund"
+9 verbose logfile logs-max:10 dir:C:\Users\HP\install-this-skill\outputs\mylekhpal\.npm-cache-build\_logs\2026-09-12T08_26_44_735Z-
+10 verbose logfile C:\Users\HP\install-this-skill\outputs\mylekhpal\.npm-cache-build\_logs\2026-09-12T08_26_44_735Z-debug-0.log
+11 silly logfile done cleaning log files
+12 silly packumentCache heap:2197815296 maxSize:549453824 maxEntrySize:274726912
+13 silly idealTree buildDeps
+14 verbose shrinkwrap failed to load node_modules/.package-lock.json out of date, updated: node_modules
+15 http fetch GET 200 https://registry.npmjs.org/npm 1288ms
+16 silly reify moves {}
+17 http cache youch-core@https://registry.npmjs.org/youch-core/-/youch-core-0.3.3.tgz 1ms (cache hit)
+18 http cache youch@https://registry.npmjs.org/youch/-/youch-4.1.0-beta.10.tgz 0ms (cache hit)
+19 http cache wrangler@https://registry.npmjs.org/wrangler/-/wrangler-4.92.0.tgz 0ms (cache hit)
+20 http cache ws@https://registry.npmjs.org/ws/-/ws-8.18.0.tgz 1ms (cache hit)
+21 http cache unenv@https://registry.npmjs.org/unenv/-/unenv-2.0.0-rc.24.tgz 0ms (cache hit)
+22 http cache tinypool@https://registry.npmjs.org/tinypool/-/tinypool-2.1.0.tgz 0ms (cache hit)
+23 http cache tailwindcss@https://registry.npmjs.org/tailwindcss/-/tailwindcss-4.2.1.tgz 0ms (cache hit)
+24 http cache sharp@https://registry.npmjs.org/sharp/-/sharp-0.34.5.tgz 0ms (cache hit)
+25 http cache resolve-pkg-maps@https://registry.npmjs.org/resolve-pkg-maps/-/resolve-pkg-maps-1.0.0.tgz 1ms (cache hit)
+26 http cache pathe@https://registry.npmjs.org/pathe/-/pathe-2.0.3.tgz 0ms (cache hit)
+27 http cache oxlint-tsgolint@https://registry.npmjs.org/oxlint-tsgolint/-/oxlint-tsgolint-7.0.2001.tgz 0ms (cache hit)
+28 http cache oxfmt@https://registry.npmjs.org/oxfmt/-/oxfmt-0.61.0.tgz 0ms (cache hit)
+29 http cache oxlint@https://registry.npmjs.org/oxlint/-/oxlint-1.76.0.tgz 0ms (cache hit)
+30 http cache miniflare@https://registry.npmjs.org/miniflare/-/miniflare-4.20260515.0.tgz 0ms (cache hit)
+31 http cache lightningcss@https://registry.npmjs.org/lightningcss/-/lightningcss-1.31.1.tgz 0ms (cache hit)
+32 http cache lightningcss-win32-x64-msvc@https://registry.npmjs.org/lightningcss-win32-x64-msvc/-/lightningcss-win32-x64-msvc-1.31.1.tgz 0ms (cache hit)
+33 http cache get-tsconfig@https://registry.npmjs.org/get-tsconfig/-/get-tsconfig-4.14.3.tgz 0ms (cache hit)
+34 http cache drizzle-kit@https://registry.npmjs.org/drizzle-kit/-/drizzle-kit-0.31.10.tgz 0ms (cache hit)
+35 http cache blake3-wasm@https://registry.npmjs.org/blake3-wasm/-/blake3-wasm-2.1.5.tgz 0ms (cache hit)
+36 http cache @tailwindcss/postcss@https://registry.npmjs.org/@tailwindcss/postcss/-/postcss-4.2.1.tgz 0ms (cache hit)
+37 http cache @tailwindcss/oxide-win32-x64-msvc@https://registry.npmjs.org/@tailwindcss/oxide-win32-x64-msvc/-/oxide-win32-x64-msvc-4.2.1.tgz 0ms (cache hit)
+38 http cache @tailwindcss/node@https://registry.npmjs.org/@tailwindcss/node/-/node-4.2.1.tgz 0ms (cache hit)
+39 http cache @tailwindcss/oxide@https://registry.npmjs.org/@tailwindcss/oxide/-/oxide-4.2.1.tgz 0ms (cache hit)
+40 http cache @speed-highlight/core@https://registry.npmjs.org/@speed-highlight/core/-/core-1.2.24.tgz 0ms (cache hit)
+41 http cache @sindresorhus/is@https://registry.npmjs.org/@sindresorhus/is/-/is-7.2.0.tgz 0ms (cache hit)
+42 http cache @poppinss/exception@https://registry.npmjs.org/@poppinss/exception/-/exception-1.2.3.tgz 0ms (cache hit)
+43 http cache @poppinss/colors@https://registry.npmjs.org/@poppinss/colors/-/colors-4.1.6.tgz 0ms (cache hit)
+44 http cache @poppinss/dumper@https://registry.npmjs.org/@poppinss/dumper/-/dumper-0.6.5.tgz 0ms (cache hit)
+45 http cache @oxlint/binding-win32-x64-msvc@https://registry.npmjs.org/@oxlint/binding-win32-x64-msvc/-/binding-win32-x64-msvc-1.76.0.tgz 0ms (cache hit)
+46 http cache @oxlint-tsgolint/win32-x64@https://registry.npmjs.org/@oxlint-tsgolint/win32-x64/-/win32-x64-7.0.2001.tgz 0ms (cache hit)
+47 http cache @oxfmt/binding-win32-x64-msvc@https://registry.npmjs.org/@oxfmt/binding-win32-x64-msvc/-/binding-win32-x64-msvc-0.61.0.tgz 0ms (cache hit)
+48 http cache @openai/sites-vite-plugin@https://registry.npmjs.org/@openai/sites-vite-plugin/-/sites-vite-plugin-0.2.0.tgz 0ms (cache hit)
+49 http cache @img/colour@https://registry.npmjs.org/@img/colour/-/colour-1.1.0.tgz 0ms (cache hit)
+50 http cache @img/sharp-win32-x64@https://registry.npmjs.org/@img/sharp-win32-x64/-/sharp-win32-x64-0.34.5.tgz 0ms (cache hit)
+51 http cache @esbuild-kit/esm-loader@https://registry.npmjs.org/@esbuild-kit/esm-loader/-/esm-loader-2.6.5.tgz 0ms (cache hit)
+52 http cache @drizzle-team/brocli@https://registry.npmjs.org/@drizzle-team/brocli/-/brocli-0.10.2.tgz 2ms (cache hit)
+53 http cache @cspotcode/source-map-support@https://registry.npmjs.org/@cspotcode/source-map-support/-/source-map-support-0.8.1.tgz 0ms (cache hit)
+54 http cache @esbuild-kit/core-utils@https://registry.npmjs.org/@esbuild-kit/core-utils/-/core-utils-3.3.2.tgz 0ms (cache hit)
+55 http cache @cloudflare/workerd-windows-64@https://registry.npmjs.org/@cloudflare/workerd-windows-64/-/workerd-windows-64-1.20260515.1.tgz 0ms (cache hit)
+56 http cache @cloudflare/vite-plugin@https://registry.npmjs.org/@cloudflare/vite-plugin/-/vite-plugin-1.37.1.tgz 0ms (cache hit)
+57 http cache error-stack-parser-es@https://registry.npmjs.org/error-stack-parser-es/-/error-stack-parser-es-1.0.5.tgz 0ms (cache hit)
+58 http cache @cloudflare/unenv-preset@https://registry.npmjs.org/@cloudflare/unenv-preset/-/unenv-preset-2.16.1.tgz 0ms (cache hit)
+59 http cache path-to-regexp@https://registry.npmjs.org/path-to-regexp/-/path-to-regexp-6.3.0.tgz 0ms (cache hit)
+60 http cache @cloudflare/kv-asset-handler@https://registry.npmjs.org/@cloudflare/kv-asset-handler/-/kv-asset-handler-0.5.0.tgz 0ms (cache hit)
+61 http cache @alloc/quick-lru@https://registry.npmjs.org/@alloc/quick-lru/-/quick-lru-5.3.0.tgz 0ms (cache hit)
+62 http cache cookie@https://registry.npmjs.org/cookie/-/cookie-1.1.1.tgz 0ms (cache hit)
+63 http cache esbuild@https://registry.npmjs.org/esbuild/-/esbuild-0.27.3.tgz 0ms (cache hit)
+64 http cache @esbuild/win32-x64@https://registry.npmjs.org/@esbuild/win32-x64/-/win32-x64-0.27.3.tgz 0ms (cache hit)
+65 http cache semver@https://registry.npmjs.org/semver/-/semver-7.8.5.tgz 0ms (cache hit)
+66 http cache esbuild@https://registry.npmjs.org/esbuild/-/esbuild-0.25.12.tgz 0ms (cache hit)
+67 http cache esbuild@https://registry.npmjs.org/esbuild/-/esbuild-0.18.20.tgz 0ms (cache hit)
+68 http cache @esbuild/win32-x64@https://registry.npmjs.org/@esbuild/win32-x64/-/win32-x64-0.25.12.tgz 0ms (cache hit)
+69 http cache supports-color@https://registry.npmjs.org/supports-color/-/supports-color-10.2.2.tgz 0ms (cache hit)
+70 http cache @esbuild/win32-x64@https://registry.npmjs.org/@esbuild/win32-x64/-/win32-x64-0.18.20.tgz 0ms (cache hit)
+71 http cache workerd@https://registry.npmjs.org/workerd/-/workerd-1.20260515.1.tgz 0ms (cache hit)
+72 silly tarball no local data for youch-core@https://registry.npmjs.org/youch-core/-/youch-core-0.3.3.tgz. Extracting by manifest.
+73 http cache @jridgewell/trace-mapping@https://registry.npmjs.org/@jridgewell/trace-mapping/-/trace-mapping-0.3.9.tgz 0ms (cache hit)
+74 silly tarball no local data for youch@https://registry.npmjs.org/youch/-/youch-4.1.0-beta.10.tgz. Extracting by manifest.
+75 silly tarball no local data for wrangler@https://registry.npmjs.org/wrangler/-/wrangler-4.92.0.tgz. Extracting by manifest.
+76 silly tarball no local data for ws@https://registry.npmjs.org/ws/-/ws-8.18.0.tgz. Extracting by manifest.
+77 silly tarball no local data for unenv@https://registry.npmjs.org/unenv/-/unenv-2.0.0-rc.24.tgz. Extracting by manifest.
+78 silly tarball no local data for tinypool@https://registry.npmjs.org/tinypool/-/tinypool-2.1.0.tgz. Extracting by manifest.
+79 silly tarball no local data for tailwindcss@https://registry.npmjs.org/tailwindcss/-/tailwindcss-4.2.1.tgz. Extracting by manifest.
+80 silly tarball no local data for sharp@https://registry.npmjs.org/sharp/-/sharp-0.34.5.tgz. Extracting by manifest.
+81 silly tarball no local data for resolve-pkg-maps@https://registry.npmjs.org/resolve-pkg-maps/-/resolve-pkg-maps-1.0.0.tgz. Extracting by manifest.
+82 silly tarball no local data for pathe@https://registry.npmjs.org/pathe/-/pathe-2.0.3.tgz. Extracting by manifest.
+83 silly tarball no local data for oxlint-tsgolint@https://registry.npmjs.org/oxlint-tsgolint/-/oxlint-tsgolint-7.0.2001.tgz. Extracting by manifest.
+84 silly tarball no local data for oxfmt@https://registry.npmjs.org/oxfmt/-/oxfmt-0.61.0.tgz. Extracting by manifest.
+85 silly tarball no local data for oxlint@https://registry.npmjs.org/oxlint/-/oxlint-1.76.0.tgz. Extracting by manifest.
+86 silly tarball no local data for miniflare@https://registry.npmjs.org/miniflare/-/miniflare-4.20260515.0.tgz. Extracting by manifest.
+87 silly tarball no local data for lightningcss@https://registry.npmjs.org/lightningcss/-/lightningcss-1.31.1.tgz. Extracting by manifest.
+88 silly tarball no local data for lightningcss-win32-x64-msvc@https://registry.npmjs.org/lightningcss-win32-x64-msvc/-/lightningcss-win32-x64-msvc-1.31.1.tgz. Extracting by manifest.
+89 silly tarball no local data for get-tsconfig@https://registry.npmjs.org/get-tsconfig/-/get-tsconfig-4.14.3.tgz. Extracting by manifest.
+90 silly tarball no local data for drizzle-kit@https://registry.npmjs.org/drizzle-kit/-/drizzle-kit-0.31.10.tgz. Extracting by manifest.
+91 silly tarball no local data for blake3-wasm@https://registry.npmjs.org/blake3-wasm/-/blake3-wasm-2.1.5.tgz. Extracting by manifest.
+92 silly tarball no local data for @tailwindcss/postcss@https://registry.npmjs.org/@tailwindcss/postcss/-/postcss-4.2.1.tgz. Extracting by manifest.
+93 silly tarball no local data for @tailwindcss/oxide-win32-x64-msvc@https://registry.npmjs.org/@tailwindcss/oxide-win32-x64-msvc/-/oxide-win32-x64-msvc-4.2.1.tgz. Extracting by manifest.
+94 silly tarball no local data for @tailwindcss/node@https://registry.npmjs.org/@tailwindcss/node/-/node-4.2.1.tgz. Extracting by manifest.
+95 silly tarball no local data for @tailwindcss/oxide@https://registry.npmjs.org/@tailwindcss/oxide/-/oxide-4.2.1.tgz. Extracting by manifest.
+96 silly tarball no local data for @speed-highlight/core@https://registry.npmjs.org/@speed-highlight/core/-/core-1.2.24.tgz. Extracting by manifest.
+97 silly tarball no local data for @sindresorhus/is@https://registry.npmjs.org/@sindresorhus/is/-/is-7.2.0.tgz. Extracting by manifest.
+98 silly tarball no local data for @poppinss/exception@https://registry.npmjs.org/@poppinss/exception/-/exception-1.2.3.tgz. Extracting by manifest.
+99 silly tarball no local data for @poppinss/colors@https://registry.npmjs.org/@poppinss/colors/-/colors-4.1.6.tgz. Extracting by manifest.
+100 silly tarball no local data for @poppinss/dumper@https://registry.npmjs.org/@poppinss/dumper/-/dumper-0.6.5.tgz. Extracting by manifest.
+101 silly tarball no local data for @oxlint/binding-win32-x64-msvc@https://registry.npmjs.org/@oxlint/binding-win32-x64-msvc/-/binding-win32-x64-msvc-1.76.0.tgz. Extracting by manifest.
+102 silly tarball no local data for @oxlint-tsgolint/win32-x64@https://registry.npmjs.org/@oxlint-tsgolint/win32-x64/-/win32-x64-7.0.2001.tgz. Extracting by manifest.
+103 silly tarball no local data for @oxfmt/binding-win32-x64-msvc@https://registry.npmjs.org/@oxfmt/binding-win32-x64-msvc/-/binding-win32-x64-msvc-0.61.0.tgz. Extracting by manifest.
+104 silly tarball no local data for @openai/sites-vite-plugin@https://registry.npmjs.org/@openai/sites-vite-plugin/-/sites-vite-plugin-0.2.0.tgz. Extracting by manifest.
+105 silly tarball no local data for @img/colour@https://registry.npmjs.org/@img/colour/-/colour-1.1.0.tgz. Extracting by manifest.
+106 silly tarball no local data for @img/sharp-win32-x64@https://registry.npmjs.org/@img/sharp-win32-x64/-/sharp-win32-x64-0.34.5.tgz. Extracting by manifest.
+107 silly tarball no local data for @esbuild-kit/esm-loader@https://registry.npmjs.org/@esbuild-kit/esm-loader/-/esm-loader-2.6.5.tgz. Extracting by manifest.
+108 silly tarball no local data for @drizzle-team/brocli@https://registry.npmjs.org/@drizzle-team/brocli/-/brocli-0.10.2.tgz. Extracting by manifest.
+109 silly tarball no local data for @cspotcode/source-map-support@https://registry.npmjs.org/@cspotcode/source-map-support/-/source-map-support-0.8.1.tgz. Extracting by manifest.
+110 silly tarball no local data for @esbuild-kit/core-utils@https://registry.npmjs.org/@esbuild-kit/core-utils/-/core-utils-3.3.2.tgz. Extracting by manifest.
+111 silly tarball no local data for @cloudflare/workerd-windows-64@https://registry.npmjs.org/@cloudflare/workerd-windows-64/-/workerd-windows-64-1.20260515.1.tgz. Extracting by manifest.
+112 silly tarball no local data for @cloudflare/vite-plugin@https://registry.npmjs.org/@cloudflare/vite-plugin/-/vite-plugin-1.37.1.tgz. Extracting by manifest.
+113 silly tarball no local data for error-stack-parser-es@https://registry.npmjs.org/error-stack-parser-es/-/error-stack-parser-es-1.0.5.tgz. Extracting by manifest.
+114 silly tarball no local data for @cloudflare/unenv-preset@https://registry.npmjs.org/@cloudflare/unenv-preset/-/unenv-preset-2.16.1.tgz. Extracting by manifest.
+115 silly tarball no local data for path-to-regexp@https://registry.npmjs.org/path-to-regexp/-/path-to-regexp-6.3.0.tgz. Extracting by manifest.
+116 silly tarball no local data for @cloudflare/kv-asset-handler@https://registry.npmjs.org/@cloudflare/kv-asset-handler/-/kv-asset-handler-0.5.0.tgz. Extracting by manifest.
+117 silly tarball no local data for @alloc/quick-lru@https://registry.npmjs.org/@alloc/quick-lru/-/quick-lru-5.3.0.tgz. Extracting by manifest.
+118 silly tarball no local data for cookie@https://registry.npmjs.org/cookie/-/cookie-1.1.1.tgz. Extracting by manifest.
+119 silly tarball no local data for esbuild@https://registry.npmjs.org/esbuild/-/esbuild-0.27.3.tgz. Extracting by manifest.
+120 silly tarball no local data for @esbuild/win32-x64@https://registry.npmjs.org/@esbuild/win32-x64/-/win32-x64-0.27.3.tgz. Extracting by manifest.
+121 silly tarball no local data for semver@https://registry.npmjs.org/semver/-/semver-7.8.5.tgz. Extracting by manifest.
+122 silly tarball no local data for esbuild@https://registry.npmjs.org/esbuild/-/esbuild-0.25.12.tgz. Extracting by manifest.
+123 silly tarball no local data for esbuild@https://registry.npmjs.org/esbuild/-/esbuild-0.18.20.tgz. Extracting by manifest.
+124 silly tarball no local data for @esbuild/win32-x64@https://registry.npmjs.org/@esbuild/win32-x64/-/win32-x64-0.25.12.tgz. Extracting by manifest.
+125 silly tarball no local data for supports-color@https://registry.npmjs.org/supports-color/-/supports-color-10.2.2.tgz. Extracting by manifest.
+126 silly tarball no local data for @esbuild/win32-x64@https://registry.npmjs.org/@esbuild/win32-x64/-/win32-x64-0.18.20.tgz. Extracting by manifest.
+127 silly tarball no local data for workerd@https://registry.npmjs.org/workerd/-/workerd-1.20260515.1.tgz. Extracting by manifest.
+128 silly tarball no local data for @jridgewell/trace-mapping@https://registry.npmjs.org/@jridgewell/trace-mapping/-/trace-mapping-0.3.9.tgz. Extracting by manifest.
+129 http fetch GET 200 https://registry.npmjs.org/youch-core/-/youch-core-0.3.3.tgz 1533ms (cache miss)
+130 http fetch GET 200 https://registry.npmjs.org/oxlint-tsgolint/-/oxlint-tsgolint-7.0.2001.tgz 1697ms (cache miss)
+131 http fetch GET 200 https://registry.npmjs.org/resolve-pkg-maps/-/resolve-pkg-maps-1.0.0.tgz 1744ms (cache miss)
+132 http fetch GET 200 https://registry.npmjs.org/@tailwindcss/postcss/-/postcss-4.2.1.tgz 2091ms (cache miss)
+133 http fetch GET 200 https://registry.npmjs.org/@tailwindcss/oxide/-/oxide-4.2.1.tgz 2131ms (cache miss)
+134 http fetch GET 200 https://registry.npmjs.org/@poppinss/exception/-/exception-1.2.3.tgz 2686ms (cache miss)
+135 http fetch GET 200 https://registry.npmjs.org/get-tsconfig/-/get-tsconfig-4.14.3.tgz 2746ms (cache miss)
+136 http fetch GET 200 https://registry.npmjs.org/@tailwindcss/node/-/node-4.2.1.tgz 2930ms (cache miss)
+137 http fetch GET 200 https://registry.npmjs.org/pathe/-/pathe-2.0.3.tgz 2987ms (cache miss)
+138 http fetch GET 200 https://registry.npmjs.org/tinypool/-/tinypool-2.1.0.tgz 3004ms (cache miss)
+139 http fetch GET 200 https://registry.npmjs.org/@esbuild-kit/esm-loader/-/esm-loader-2.6.5.tgz 3066ms (cache miss)
+140 http fetch GET 200 https://registry.npmjs.org/@sindresorhus/is/-/is-7.2.0.tgz 3099ms (cache miss)
+141 warn deprecated @esbuild-kit/esm-loader@2.6.5: Merged into tsx: https://tsx.hirok.io
+142 http fetch GET 200 https://registry.npmjs.org/@img/colour/-/colour-1.1.0.tgz 3105ms (cache miss)
+143 http fetch GET 200 https://registry.npmjs.org/@openai/sites-vite-plugin/-/sites-vite-plugin-0.2.0.tgz 3252ms (cache miss)
+144 http fetch GET 200 https://registry.npmjs.org/@poppinss/colors/-/colors-4.1.6.tgz 3260ms (cache miss)
+145 http fetch GET 200 https://registry.npmjs.org/@cspotcode/source-map-support/-/source-map-support-0.8.1.tgz 3304ms (cache miss)
+146 http fetch GET 200 https://registry.npmjs.org/lightningcss/-/lightningcss-1.31.1.tgz 3359ms (cache miss)
+147 http fetch GET 200 https://registry.npmjs.org/@esbuild-kit/core-utils/-/core-utils-3.3.2.tgz 3415ms (cache miss)
+148 warn deprecated @esbuild-kit/core-utils@3.3.2: Merged into tsx: https://tsx.hirok.io
+149 http fetch GET 200 https://registry.npmjs.org/ws/-/ws-8.18.0.tgz 3487ms (cache miss)
+150 http fetch GET 200 https://registry.npmjs.org/@drizzle-team/brocli/-/brocli-0.10.2.tgz 3633ms (cache miss)
+151 http fetch GET 200 https://registry.npmjs.org/error-stack-parser-es/-/error-stack-parser-es-1.0.5.tgz 3639ms (cache miss)
+152 http fetch GET 200 https://registry.npmjs.org/@cloudflare/unenv-preset/-/unenv-preset-2.16.1.tgz 4058ms (cache miss)
+153 http fetch GET 200 https://registry.npmjs.org/path-to-regexp/-/path-to-regexp-6.3.0.tgz 4261ms (cache miss)
+154 http fetch GET 200 https://registry.npmjs.org/oxlint/-/oxlint-1.76.0.tgz 4318ms (cache miss)
+155 http fetch GET 200 https://registry.npmjs.org/tailwindcss/-/tailwindcss-4.2.1.tgz 4338ms (cache miss)
+156 http fetch GET 200 https://registry.npmjs.org/sharp/-/sharp-0.34.5.tgz 4364ms (cache miss)
+157 http fetch GET 200 https://registry.npmjs.org/@cloudflare/kv-asset-handler/-/kv-asset-handler-0.5.0.tgz 4371ms (cache miss)
+158 http fetch GET 200 https://registry.npmjs.org/@alloc/quick-lru/-/quick-lru-5.3.0.tgz 4371ms (cache miss)
+159 http fetch GET 200 https://registry.npmjs.org/@poppinss/dumper/-/dumper-0.6.5.tgz 4392ms (cache miss)
+160 http fetch GET 200 https://registry.npmjs.org/youch/-/youch-4.1.0-beta.10.tgz 4632ms (cache miss)
+161 http fetch GET 200 https://registry.npmjs.org/cookie/-/cookie-1.1.1.tgz 4602ms (cache miss)
+162 http fetch GET 200 https://registry.npmjs.org/esbuild/-/esbuild-0.27.3.tgz 4736ms (cache miss)
+163 http fetch GET 200 https://registry.npmjs.org/esbuild/-/esbuild-0.25.12.tgz 5234ms (cache miss)
+164 http fetch GET 200 https://registry.npmjs.org/esbuild/-/esbuild-0.18.20.tgz 5358ms (cache miss)
+165 http fetch GET 200 https://registry.npmjs.org/supports-color/-/supports-color-10.2.2.tgz 5461ms (cache miss)
+166 http fetch GET 200 https://registry.npmjs.org/semver/-/semver-7.8.5.tgz 5522ms (cache miss)
+167 http fetch GET 200 https://registry.npmjs.org/blake3-wasm/-/blake3-wasm-2.1.5.tgz 6645ms (cache miss)
+168 http fetch GET 200 https://registry.npmjs.org/@speed-highlight/core/-/core-1.2.24.tgz 6969ms (cache miss)
+169 http fetch GET 200 https://registry.npmjs.org/unenv/-/unenv-2.0.0-rc.24.tgz 8135ms (cache miss)
+170 http fetch GET 200 https://registry.npmjs.org/@tailwindcss/oxide-win32-x64-msvc/-/oxide-win32-x64-msvc-4.2.1.tgz 15837ms (cache miss)
+171 http fetch GET 200 https://registry.npmjs.org/@jridgewell/trace-mapping/-/trace-mapping-0.3.9.tgz 16200ms (cache miss)
+172 http fetch GET 200 https://registry.npmjs.org/@cloudflare/vite-plugin/-/vite-plugin-1.37.1.tgz 16642ms (cache miss)
+173 http fetch GET 200 https://registry.npmjs.org/workerd/-/workerd-1.20260515.1.tgz 16909ms (cache miss)
+174 http fetch GET 200 https://registry.npmjs.org/oxfmt/-/oxfmt-0.61.0.tgz 18966ms (cache miss)
+175 http fetch GET 200 https://registry.npmjs.org/drizzle-kit/-/drizzle-kit-0.31.10.tgz 20174ms (cache miss)
+176 http fetch GET 200 https://registry.npmjs.org/lightningcss-win32-x64-msvc/-/lightningcss-win32-x64-msvc-1.31.1.tgz 20391ms (cache miss)
+177 http fetch GET 200 https://registry.npmjs.org/wrangler/-/wrangler-4.92.0.tgz 23334ms (cache miss)
+178 http fetch GET 200 https://registry.npmjs.org/@esbuild/win32-x64/-/win32-x64-0.18.20.tgz 28523ms (cache miss)
+179 http fetch GET 200 https://registry.npmjs.org/miniflare/-/miniflare-4.20260515.0.tgz 29523ms (cache miss)
+180 http fetch GET 200 https://registry.npmjs.org/@oxfmt/binding-win32-x64-msvc/-/binding-win32-x64-msvc-0.61.0.tgz 33843ms (cache miss)
+181 http fetch GET 200 https://registry.npmjs.org/@esbuild/win32-x64/-/win32-x64-0.25.12.tgz 37191ms (cache miss)
+182 http fetch GET 200 https://registry.npmjs.org/@esbuild/win32-x64/-/win32-x64-0.27.3.tgz 42020ms (cache miss)
+183 http fetch GET 200 https://registry.npmjs.org/@oxlint/binding-win32-x64-msvc/-/binding-win32-x64-msvc-1.76.0.tgz 42354ms (cache miss)
+184 http fetch GET 200 https://registry.npmjs.org/@img/sharp-win32-x64/-/sharp-win32-x64-0.34.5.tgz 47441ms (cache miss)
+185 http fetch GET 200 https://registry.npmjs.org/@oxlint-tsgolint/win32-x64/-/win32-x64-7.0.2001.tgz 47729ms (cache miss)
+186 http fetch GET 200 https://registry.npmjs.org/@cloudflare/workerd-windows-64/-/workerd-windows-64-1.20260515.1.tgz 61579ms (cache miss)
+187 silly ADD node_modules/youch-core
+188 silly ADD node_modules/youch
+189 silly ADD node_modules/youch/node_modules/cookie
+190 silly ADD node_modules/ws
+191 silly ADD node_modules/wrangler
+192 silly ADD node_modules/wrangler/node_modules/path-to-regexp
+193 silly ADD node_modules/wrangler/node_modules/esbuild
+194 silly ADD node_modules/wrangler/node_modules/@esbuild/win32-x64
+195 silly ADD node_modules/workerd
+196 silly ADD node_modules/unenv
+197 silly ADD node_modules/tinypool
+198 silly ADD node_modules/tailwindcss
+199 silly ADD node_modules/sharp
+200 silly ADD node_modules/sharp/node_modules/semver
+201 silly ADD node_modules/resolve-pkg-maps
+202 silly ADD node_modules/pathe
+203 silly ADD node_modules/oxlint-tsgolint
+204 silly ADD node_modules/oxlint
+205 silly ADD node_modules/oxfmt
+206 silly ADD node_modules/miniflare
+207 silly ADD node_modules/lightningcss-win32-x64-msvc
+208 silly ADD node_modules/lightningcss
+209 silly ADD node_modules/get-tsconfig
+210 silly ADD node_modules/error-stack-parser-es
+211 silly ADD node_modules/drizzle-kit
+212 silly ADD node_modules/drizzle-kit/node_modules/esbuild
+213 silly ADD node_modules/drizzle-kit/node_modules/@esbuild/win32-x64
+214 silly ADD node_modules/blake3-wasm
+215 silly ADD node_modules/@tailwindcss/postcss
+216 silly ADD node_modules/@tailwindcss/oxide-win32-x64-msvc
+217 silly ADD node_modules/@tailwindcss/oxide
+218 silly ADD node_modules/@tailwindcss/node
+219 silly ADD node_modules/@speed-highlight/core
+220 silly ADD node_modules/@sindresorhus/is
+221 silly ADD node_modules/@poppinss/exception
+222 silly ADD node_modules/@poppinss/dumper
+223 silly ADD node_modules/@poppinss/dumper/node_modules/supports-color
+224 silly ADD node_modules/@poppinss/colors
+225 silly ADD node_modules/@oxlint/binding-win32-x64-msvc
+226 silly ADD node_modules/@oxlint-tsgolint/win32-x64
+227 silly ADD node_modules/@oxfmt/binding-win32-x64-msvc
+228 silly ADD node_modules/@openai/sites-vite-plugin
+229 silly ADD node_modules/@img/sharp-win32-x64
+230 silly ADD node_modules/@img/colour
+231 silly ADD node_modules/@esbuild-kit/esm-loader
+232 silly ADD node_modules/@esbuild-kit/core-utils
+233 silly ADD node_modules/@esbuild-kit/core-utils/node_modules/esbuild
+234 silly ADD node_modules/@esbuild-kit/core-utils/node_modules/@esbuild/win32-x64
+235 silly ADD node_modules/@drizzle-team/brocli
+236 silly ADD node_modules/@cspotcode/source-map-support
+237 silly ADD node_modules/@cspotcode/source-map-support/node_modules/@jridgewell/trace-mapping
+238 silly ADD node_modules/@cloudflare/workerd-windows-64
+239 silly ADD node_modules/@cloudflare/vite-plugin
+240 silly ADD node_modules/@cloudflare/unenv-preset
+241 silly ADD node_modules/@cloudflare/kv-asset-handler
+242 silly ADD node_modules/@alloc/quick-lru
+243 verbose cwd C:\Users\HP\install-this-skill\outputs\mylekhpal
+244 verbose os Windows_NT 10.0.19045
+245 verbose node v22.20.0
+246 verbose npm  v11.13.0
+247 notice
+247 notice New minor version of npm available! 11.13.0 -> 11.19.1
+247 notice Changelog: https://github.com/npm/cli/releases/tag/v11.19.1
+247 notice To update run: npm install -g npm@11.19.1
+247 notice  { force: true, [Symbol(proc-log.meta)]: true }
+248 verbose exit 0
+249 info ok

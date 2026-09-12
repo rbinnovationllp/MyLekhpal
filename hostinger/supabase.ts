@@ -40,3 +40,28 @@ export async function startPersonalSubscription(householdId: string, planCode: s
   if (data?.error || !data?.shortUrl) throw new Error(data?.error || 'Unable to start secure payment authorisation.');
   window.location.assign(data.shortUrl);
 }
+
+export async function startBusinessSubscription(businessId: string, planCode: string) {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session?.access_token) throw new Error('Your sign-in session has expired. Please sign in again.');
+  const { data, error } = await supabase.functions.invoke('create-razorpay-business-subscription', { body: { businessId, planCode, accessToken: session.access_token }, headers: { Authorization: `Bearer ${session.access_token}` } });
+  if (error) throw new Error(error.message || 'Unable to start secure payment authorisation.');
+  if (data?.error || !data?.shortUrl) throw new Error(data?.error || 'Unable to start secure payment authorisation.');
+  window.location.assign(data.shortUrl);
+}
+
+export async function googleDriveRequest(
+  action: 'google-drive-connect' | 'google-drive-status',
+  serviceArea: 'business' | 'personal',
+  workspaceId: string,
+) {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session?.access_token) throw new Error('Your sign-in session has expired. Please sign in again.');
+  const { data, error } = await supabase.functions.invoke(action, {
+    body: { serviceArea, workspaceId, accessToken: session.access_token },
+    headers: { Authorization: `Bearer ${session.access_token}` },
+  });
+  if (error) throw new Error(error.message || 'Google Drive connection is unavailable.');
+  if (data?.error) throw new Error(data.error);
+  return data;
+}

@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
-import { booksRequest, prepareJournalDraft } from '../../hostinger/supabase';
+import { booksRequest, googleDriveRequest, prepareJournalDraft, startBusinessSubscription } from '../../hostinger/supabase';
 import {
   BookOpenCheck,
   Plus,
@@ -99,6 +99,10 @@ export default function Workspace({ user }: { user: string }) {
     [importFile, setImportFile] = useState<File | null>(null),
     [aiDraft, setAiDraft] = useState<any>(null),
     [aiBusy, setAiBusy] = useState(false),
+    [googleDrive, setGoogleDrive] = useState<{ connected: boolean; email?: string }>({ connected: false }),
+    [googleBusy, setGoogleBusy] = useState(false),
+    [subscriptionBusy, setSubscriptionBusy] = useState(false),
+    [businessPlan, setBusinessPlan] = useState('small_business_monthly'),
     [hi, setHi] = useState(false);
   const uploadRef = useRef<HTMLInputElement>(null);
   const cameraRef = useRef<HTMLInputElement>(null);
@@ -152,6 +156,32 @@ export default function Workspace({ user }: { user: string }) {
       valid = false;
     };
   }, [active]);
+  useEffect(() => {
+    if (!active) { setGoogleDrive({ connected: false }); return; }
+    let valid = true;
+    googleDriveRequest('google-drive-status', 'business', active)
+      .then((status) => { if (valid) setGoogleDrive(status); })
+      .catch(() => { if (valid) setGoogleDrive({ connected: false }); });
+    return () => { valid = false; };
+  }, [active]);
+  async function connectGoogleDrive() {
+    if (!active) return;
+    setGoogleBusy(true); setError('');
+    try {
+      const result = await googleDriveRequest('google-drive-connect', 'business', active);
+      if (result.connected) { setGoogleDrive(result); setNotice('Google Drive is already connected for this business.'); return; }
+      if (!result.authorizationUrl) throw new Error('The secure Google authorisation link was unavailable.');
+      window.location.assign(result.authorizationUrl);
+    } catch (reason: any) { setError(reason.message || 'Unable to start the secure Google Drive connection.'); }
+    finally { setGoogleBusy(false); }
+  }
+  async function authoriseBusinessPlan() {
+    if (!active) return;
+    setSubscriptionBusy(true); setError('');
+    try { await startBusinessSubscription(active, businessPlan); }
+    catch (reason: any) { setError(reason.message || 'Unable to start secure payment authorisation.'); }
+    finally { setSubscriptionBusy(false); }
+  }
   useEffect(() => {
     const ctx = (document as any).modelContext;
     if (!ctx?.registerTool) return;
@@ -414,10 +444,13 @@ export default function Workspace({ user }: { user: string }) {
             </span>
             <h1>{t('Clarity starts here.', 'स्पष्टता की शुरुआत यहाँ।')}</h1>
           </div>
-          <button className="button small" onClick={() => setSetup(!setup)}>
-            <Plus size={18} />
-            {t('Add business', 'व्यवसाय जोड़ें')}
-          </button>
+          <div className="workspace-actions">
+            {active && <button className="quiet drive-button" disabled={googleBusy} onClick={connectGoogleDrive}>{googleBusy ? 'Opening Google…' : googleDrive.connected ? `Google Drive connected${googleDrive.email ? `: ${googleDrive.email}` : ''}` : 'Connect Google Drive / Sheets'}</button>}
+            <button className="button small" onClick={() => setSetup(!setup)}>
+              <Plus size={18} />
+              {t('Add business', 'व्यवसाय जोड़ें')}
+            </button>
+          </div>
         </div>
         {businesses.length > 0 && (
           <div className="business-switch">
@@ -638,6 +671,28 @@ export default function Workspace({ user }: { user: string }) {
                     </small>
                   </div>
                 </div>
+                <section className="panel">
+                  <h2>Business plan and 14-day trial</h2>
+                  <p>Your 14-day trial starts when this business is created. Select a plan and authorise AutoPay securely; no recurring charge is due until the trial ends.</p>
+                  <label>
+                    Business plan
+                    <select value={businessPlan} onChange={(e) => setBusinessPlan(e.target.value)}>
+                      <option value="micro_vendor_monthly">Micro Vendor — monthly</option>
+                      <option value="small_business_monthly">Small Business — monthly</option>
+                      <option value="business_plus_monthly">Business Plus — monthly</option>
+                      <option value="accountant_bookkeeper_monthly">Accountant / Bookkeeper — monthly</option>
+                      <option value="ca_practice_monthly">CA Practice — monthly</option>
+                      <option value="micro_vendor_yearly">Micro Vendor — yearly</option>
+                      <option value="small_business_yearly">Small Business — yearly</option>
+                      <option value="business_plus_yearly">Business Plus — yearly</option>
+                      <option value="accountant_bookkeeper_yearly">Accountant / Bookkeeper — yearly</option>
+                      <option value="ca_practice_yearly">CA Practice — yearly</option>
+                    </select>
+                  </label>
+                  <button className="button" disabled={subscriptionBusy} onClick={authoriseBusinessPlan}>
+                    {subscriptionBusy ? 'Opening secure authorisation…' : 'Authorise plan securely'}
+                  </button>
+                </section>
                 <section className="panel">
                   <h2>
                     {t(

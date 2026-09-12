@@ -3,6 +3,7 @@ Options -Indexes
 <IfModule mod_rewrite.c>
 RewriteEngine On
 RewriteRule ^workspace/?$ index.html [L]
+RewriteRule ^personal/?$ index.html [L]
 </IfModule>
 <IfModule mod_headers.c>
 Header always set X-Content-Type-Options "nosniff"

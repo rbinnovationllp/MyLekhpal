@@ -1,0 +1,19 @@
+0 verbose cli C:\Program Files\nodejs\node.exe C:\Users\HP\AppData\Roaming\npm\node_modules\npm\bin\npm-cli.js
+1 info using npm@11.13.0
+2 info using node@v22.20.0
+3 silly config load:file:C:\Users\HP\AppData\Roaming\npm\node_modules\npm\npmrc
+4 silly config load:file:C:\Users\HP\install-this-skill\outputs\mylekhpal\.npmrc
+5 silly config load:file:C:\Users\HP\.npmrc
+6 silly config load:file:C:\Users\HP\AppData\Roaming\npm\etc\npmrc
+7 verbose title npm ls @tailwindcss/postcss
+8 verbose argv "ls" "@tailwindcss/postcss" "--depth" "0"
+9 verbose logfile logs-max:10 dir:C:\Users\HP\install-this-skill\outputs\mylekhpal\.npm-cache-build\_logs\2026-09-12T08_27_58_130Z-
+10 verbose logfile C:\Users\HP\install-this-skill\outputs\mylekhpal\.npm-cache-build\_logs\2026-09-12T08_27_58_130Z-debug-0.log
+11 silly logfile done cleaning log files
+12 silly packumentCache heap:2197815296 maxSize:549453824 maxEntrySize:274726912
+13 verbose cwd C:\Users\HP\install-this-skill\outputs\mylekhpal
+14 verbose os Windows_NT 10.0.19045
+15 verbose node v22.20.0
+16 verbose npm  v11.13.0
+17 verbose exit 1
+18 verbose code 1

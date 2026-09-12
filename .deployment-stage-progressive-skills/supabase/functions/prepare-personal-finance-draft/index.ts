@@ -41,7 +41,7 @@ const outputSchema = {
 
 Deno.serve(async (req) => {
   const origin = req.headers.get('origin');
-  if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: origin && allowedOrigins.has(origin) ? { 'access-control-allow-origin': origin, 'access-control-allow-headers': 'authorization, content-type', 'access-control-allow-methods': 'POST, OPTIONS', vary: 'origin' } : {} });
+  if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: origin && allowedOrigins.has(origin) ? { 'access-control-allow-origin': origin, 'access-control-allow-headers': 'authorization, content-type, apikey, x-client-info', 'access-control-allow-methods': 'POST, OPTIONS', vary: 'origin' } : {} });
   if (req.method !== 'POST') return reply({ error: 'Method not allowed.' }, 405, undefined, origin);
   if (origin && !allowedOrigins.has(origin)) return reply({ error: 'Request origin rejected.' }, 403, undefined, origin);
   const input = await req.json() as Input;
@@ -78,6 +78,11 @@ Deno.serve(async (req) => {
     if (!consent) return reply({ error: 'Confirm the purpose of this sensitive-document analysis before submitting it.' }, 409, undefined, origin);
     const { data: entitlement } = await admin.from('personal_service_entitlements').select('personal_finance_enabled,monthly_ai_limit').eq('household_id', input.householdId).maybeSingle();
     if (!entitlement?.personal_finance_enabled) return reply({ error: 'Personal Finance & Tax Support is not included in a currently approved plan. No analysis was sent.' }, 402, undefined, origin);
+    const { data: subscription } = await admin.from('personal_subscriptions').select('status,trial_ends_at').eq('household_id', input.householdId).maybeSingle();
+    const trialIsCurrent = subscription?.status === 'trial' && subscription.trial_ends_at && new Date(subscription.trial_ends_at).valueOf() > Date.now();
+    if (!trialIsCurrent && subscription?.status !== 'active') {
+      return reply({ error: 'Your Personal Finance trial has ended. Authorise an active plan to continue.' }, 402, undefined, origin);
+    }
     const inputHash = await sha256(input.file?.base64 || input.manualText || ''), { data: previous } = await admin.from('private.personal_ai_processing_logs').select('id').eq('household_id', input.householdId).eq('input_hash', inputHash).eq('status', 'completed').limit(1).maybeSingle();
     if (previous) return reply({ error: 'This exact submission has already been processed. Review its existing draft instead of submitting it again.' }, 409, undefined, origin);
     const provisionalRequestId = crypto.randomUUID();

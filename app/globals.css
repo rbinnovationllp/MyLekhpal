@@ -806,6 +806,8 @@ footer small {
   gap: 20px;
   margin: 30px 0;
 }
+.workspace-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.drive-button { border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; color: #175c4b; background: #f5fbf7; font-weight: 700; }
 .workspace-title h1 {
   font-size: 37px;
   letter-spacing: -1.5px;
