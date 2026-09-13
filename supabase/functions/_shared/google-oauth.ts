@@ -74,7 +74,10 @@ export async function diagnostic(admin: ReturnType<typeof createClient>, event: 
 export async function requireWorkspaceMember(admin: ReturnType<typeof createClient>, userId: string, serviceArea: ServiceArea, workspaceId: string) {
   const table = serviceArea === 'business' ? 'business_memberships' : 'household_memberships';
   const column = serviceArea === 'business' ? 'business_id' : 'household_id';
-  const { data } = await admin.from(table).select('role,status,access_expires_at').eq(column, workspaceId).eq('user_id', userId).eq('status', 'active').maybeSingle();
-  if (!data || (data.access_expires_at && new Date(data.access_expires_at).valueOf() <= Date.now())) return false;
+  // business_memberships has no access_expires_at column; only household
+  // memberships support time-limited access.
+  const fields = serviceArea === 'business' ? 'role,status' : 'role,status,access_expires_at';
+  const { data } = await admin.from(table).select(fields).eq(column, workspaceId).eq('user_id', userId).eq('status', 'active').maybeSingle();
+  if (!data || (serviceArea === 'personal' && data.access_expires_at && new Date(data.access_expires_at).valueOf() <= Date.now())) return false;
   return serviceArea === 'business' ? ['owner', 'admin'].includes(data.role) : ['owner'].includes(data.role);
 }

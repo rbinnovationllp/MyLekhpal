@@ -11,6 +11,8 @@ const reply = (body: unknown, status = 200, origin?: string | null) => new Respo
 });
 
 const nowSeconds = () => Math.floor(Date.now() / 1000);
+// Subscription access/mandate ends at the close of 31 December 2046 in IST.
+const subscriptionEndAt = 2429893799;
 // Razorpay expects Unix timestamps in seconds (not JavaScript milliseconds) and
 // requires the authorisation window to extend beyond a future subscription start.
 const razorpayTimestamp = (value: number) => {
@@ -86,10 +88,10 @@ Deno.serve(async (req) => {
       body: JSON.stringify({
         plan_id: plan.razorpay_plan_id,
         quantity: 1,
-        // Razorpay derives the UPI mandate end_time from this value. A 100-year
-        // subscription can exceed Razorpay's 2121 timestamp ceiling and makes
-        // the QR refresh fail. Sixty years remains long-running and in range.
-        total_count: plan.interval === 'yearly' ? 60 : 720,
+        // Use an explicit end date rather than a long cycle count. It is within
+        // Razorpay's subscription-link maximum duration and avoids QR end_time
+        // validation failures caused by an overlong mandate.
+        end_at: subscriptionEndAt,
         customer_notify: true,
         start_at: startAt,
         expire_by: expireBy,
@@ -132,7 +134,7 @@ Deno.serve(async (req) => {
       actor_type: 'human',
       action: 'autopay_authorisation_requested',
       provider_event_id: `subscription-created:${providerBody.id}`,
-      details: { plan_code: plan.code, provider_subscription_id: providerBody.id, trial_ends_at: new Date(startAt * 1000).toISOString(), start_at: startAt, expires_at: expireBy },
+      details: { plan_code: plan.code, provider_subscription_id: providerBody.id, trial_ends_at: new Date(startAt * 1000).toISOString(), start_at: startAt, end_at: subscriptionEndAt, expires_at: expireBy },
     });
 
     return reply({ shortUrl: providerBody.short_url, subscriptionId: providerBody.id, trialDurationDays: 3 }, 201, origin);

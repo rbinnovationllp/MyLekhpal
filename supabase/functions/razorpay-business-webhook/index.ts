@@ -25,12 +25,13 @@ Deno.serve(async (req) => {
     if (!business && !household) return new Response('Ignored.', { status: 200 });
     const status = ['subscription.authenticated', 'subscription.activated'].includes(event.event)
       ? 'active'
-      : event.event === 'subscription.cancelled' ? 'cancelled' : null;
+      : event.event === 'subscription.cancelled' ? 'cancelled'
+      : event.event === 'subscription.completed' ? 'expired' : null;
     if (status && business) await admin.from('business_subscriptions').update({ status, updated_at: new Date().toISOString() }).eq('business_id', business.business_id);
     if (status && household) {
       await admin.from('personal_subscriptions').update({ status, updated_at: new Date().toISOString() }).eq('household_id', household.household_id);
       if (status === 'active') await admin.from('personal_service_entitlements').update({ personal_finance_enabled: true, source: 'subscription', updated_at: new Date().toISOString() }).eq('household_id', household.household_id);
-      if (status === 'cancelled') await admin.from('personal_service_entitlements').update({ personal_finance_enabled: false, updated_at: new Date().toISOString() }).eq('household_id', household.household_id);
+      if (status === 'cancelled' || status === 'expired') await admin.from('personal_service_entitlements').update({ personal_finance_enabled: false, updated_at: new Date().toISOString() }).eq('household_id', household.household_id);
     }
     await admin.from('payment_events').upsert({
       provider: 'razorpay', provider_event_id: `webhook:${subscriptionId}:${event.event}:${event.created_at || 0}`,
