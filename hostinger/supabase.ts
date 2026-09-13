@@ -4,11 +4,24 @@ export const supabase = createClient(import.meta.env.VITE_SUPABASE_URL, import.m
 async function edgeFunctionError(error: unknown, fallback: string) {
   const response = (error as { context?: { json?: () => Promise<unknown> } } | null)?.context;
   if (response?.json) {
-    const body = await response.json().catch(() => null) as { error?: unknown; message?: unknown } | null;
+    const body = await response.json().catch(() => null) as { error?: unknown; message?: unknown; requestId?: unknown } | null;
     const message = typeof body?.error === 'string' ? body.error : typeof body?.message === 'string' ? body.message : null;
-    if (message) return new Error(message);
+    const requestId = typeof body?.requestId === 'string' ? body.requestId : null;
+    if (message) return new Error(requestId ? `${message} Reference: ${requestId}` : message);
   }
   return new Error(fallback);
+}
+
+async function withTimeout<T>(operation: Promise<T>, milliseconds: number, message: string): Promise<T> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    return await Promise.race([
+      operation,
+      new Promise<never>((_, reject) => { timer = setTimeout(() => reject(new Error(message)), milliseconds); }),
+    ]);
+  } finally {
+    if (timer) clearTimeout(timer);
+  }
 }
 
 export async function booksRequest(url: string, body?: unknown) {
@@ -36,7 +49,11 @@ export async function personalFinanceRequest(payload: unknown) {
   const { data: { session } } = await supabase.auth.getSession();
   if (!session?.access_token) throw new Error('Your sign-in session has expired. Please sign in again.');
   const body = typeof payload === 'object' && payload !== null ? { ...payload as Record<string, unknown>, accessToken: session.access_token } : payload;
-  const { data, error } = await supabase.functions.invoke('prepare-personal-finance-draft', { body, headers: { Authorization: `Bearer ${session.access_token}` } });
+  const { data, error } = await withTimeout(
+    supabase.functions.invoke('prepare-personal-finance-draft', { body, headers: { Authorization: `Bearer ${session.access_token}` } }),
+    120_000,
+    'Preparing the draft timed out. Your documents are still selected; please try again.'
+  );
   if (error) throw await edgeFunctionError(error, 'Personal Finance & Tax Support is unavailable.');
   if (data?.error) throw new Error(data.error);
   return data;

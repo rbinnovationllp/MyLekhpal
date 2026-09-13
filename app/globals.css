@@ -897,6 +897,30 @@ footer small {
   flex-wrap: wrap;
   gap: 8px;
 }
+.upload-file-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.upload-file-list li {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 10px 12px;
+  border: 1px solid #d0ded7;
+  border-radius: 8px;
+  background: #fff;
+}
+.upload-file-list li > span:nth-child(3) { display: grid; gap: 2px; flex: 1; min-width: 0; }
+.upload-file-list b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.upload-file-list small { color: #526772; font-weight: 400; }
+.upload-file-list a { color: #176d58; font-size: 13px; font-weight: 700; }
+.upload-file-error { border-color: #e9a9a1 !important; background: #fff5f4 !important; }
+.upload-file-error small { color: #b43a31; }
+.icon-button { display: grid; place-items: center; width: 31px; height: 31px; padding: 0; border: 1px solid #d0ded7; border-radius: 6px; color: #175c4b; background: #fff; }
+.icon-button:disabled { opacity: .45; }
 .personal-draft .check {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);

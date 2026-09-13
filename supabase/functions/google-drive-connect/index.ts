@@ -150,7 +150,7 @@ Deno.serve(async (req: Request) => {
     }
 
     return reply(
-      { error: 'Unable to start the secure Google Drive connection. Please contact support if this continues.' },
+      { error: 'Unable to start the secure Google Drive connection. Please contact support if this continues.', requestId },
       503,
       origin
     );
