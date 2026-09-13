@@ -19,7 +19,8 @@ Deno.serve(async (req) => {
     const target = serviceArea === 'business' ? { business_id: workspaceId } : { household_id: workspaceId };
     const { data: connection } = await admin.from('workspace_google_connections').select('id,google_account_email,sync_status').match(target).is('revoked_at', null).maybeSingle();
     if (!connection) return reply({ connected: false }, 200, origin);
-    const { data: secret } = await admin.schema('private').from('workspace_google_connection_secrets').select('*').eq('connection_id', connection.id).maybeSingle();
+    const { data: secrets } = await admin.rpc('google_oauth_get_secret', { p_connection_id: connection.id });
+    const secret = secrets?.[0];
     if (!secret) return reply({ connected: false, needsReauthorization: true }, 200, origin);
     if (new Date(secret.access_token_expires_at).valueOf() <= Date.now() + 60_000) {
       const refreshToken = await decryptToken(secret.refresh_token_ciphertext), clientId = Deno.env.get('GOOGLE_CLIENT_ID'), clientSecret = Deno.env.get('GOOGLE_CLIENT_SECRET');
@@ -31,7 +32,7 @@ Deno.serve(async (req) => {
         await diagnostic(admin, { requestId, stage: 'token_refresh', outcome: 'failed', serviceArea, workspaceId, userId: user.id, errorCode: `refresh_${response.status}` });
         return reply({ connected: false, needsReauthorization: true }, 200, origin);
       }
-      await admin.schema('private').from('workspace_google_connection_secrets').update({ access_token_ciphertext: await encryptToken(token.access_token), access_token_expires_at: new Date(Date.now() + Math.max(60, Number(token.expires_in || 3600)) * 1000).toISOString(), rotated_at: new Date().toISOString() }).eq('connection_id', connection.id);
+      await admin.rpc('google_oauth_store_secret', { p_connection_id: connection.id, p_refresh: secret.refresh_token_ciphertext, p_access: await encryptToken(token.access_token), p_expires_at: new Date(Date.now() + Math.max(60, Number(token.expires_in || 3600)) * 1000).toISOString() });
       await admin.from('workspace_google_connections').update({ sync_status: 'connected', last_token_refresh_at: new Date().toISOString() }).eq('id', connection.id);
       await diagnostic(admin, { requestId, stage: 'token_refresh', outcome: 'succeeded', serviceArea, workspaceId, userId: user.id });
     }

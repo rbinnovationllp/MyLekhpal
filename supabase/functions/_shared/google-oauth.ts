@@ -134,14 +134,10 @@ export async function diagnostic(
   }
 ): Promise<void> {
   try {
-    await admin.schema('private').from('google_oauth_diagnostics').insert({
-      request_id: event.requestId,
-      stage: event.stage,
-      outcome: event.outcome,
-      service_area: event.serviceArea || null,
-      workspace_id: event.workspaceId || null,
-      user_id: event.userId || null,
-      error_code: event.errorCode || null,
+    await admin.rpc('google_oauth_log', {
+      p_request_id: event.requestId, p_stage: event.stage, p_outcome: event.outcome,
+      p_service_area: event.serviceArea || null, p_workspace_id: event.workspaceId || null,
+      p_user_id: event.userId || null, p_error_code: event.errorCode || null,
     });
   } catch (err) {
     console.error('Failed to log diagnostic event:', err);

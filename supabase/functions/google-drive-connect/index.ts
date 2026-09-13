@@ -86,16 +86,12 @@ Deno.serve(async (req: Request) => {
     }
 
     const state = randomState();
-    const { error: stateError } = await admin
-      .schema('private')
-      .from('workspace_google_oauth_states')
-      .insert({
-        state_hash: await sha256(state),
-        service_area: serviceArea,
-        ...target,
-        user_id: user.id,
-        expires_at: new Date(Date.now() + 10 * 60 * 1000).toISOString(),
-      });
+    const { error: stateError } = await admin.rpc('google_oauth_create_state', {
+      p_state_hash: await sha256(state), p_service_area: serviceArea,
+      p_business_id: serviceArea === 'business' ? input.workspaceId : null,
+      p_household_id: serviceArea === 'personal' ? input.workspaceId : null,
+      p_user_id: user.id, p_expires_at: new Date(Date.now() + 10 * 60 * 1000).toISOString(),
+    });
 
     if (stateError) {
       console.error('OAuth state insert error:', stateError);

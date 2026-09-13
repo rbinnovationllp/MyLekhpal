@@ -11,8 +11,9 @@ Deno.serve(async (req) => {
     const url = new URL(req.url), providerError = url.searchParams.get('error'), code = url.searchParams.get('code'), state = url.searchParams.get('state');
     if (providerError || !code || !state) throw new Error(providerError ? `provider_${providerError}` : 'missing_callback_parameters');
     admin = adminClient();
-    const { data: stateRow } = await admin.schema('private').from('workspace_google_oauth_states').select('*').eq('state_hash', await sha256(state)).maybeSingle();
-    if (!stateRow || new Date(stateRow.expires_at).valueOf() < Date.now()) throw new Error('invalid_or_expired_state');
+    const { data: states, error: stateError } = await admin.rpc('google_oauth_consume_state', { p_state_hash: await sha256(state) });
+    const stateRow = states?.[0];
+    if (stateError || !stateRow || new Date(stateRow.expires_at).valueOf() < Date.now()) throw new Error('invalid_or_expired_state');
     const serviceArea = stateRow.service_area as ServiceArea, workspaceId = (stateRow.business_id || stateRow.household_id) as string;
     callbackServiceArea = serviceArea;
     await diagnostic(admin, { requestId, stage: 'callback_received', outcome: 'started', serviceArea, workspaceId, userId: stateRow.user_id });
@@ -34,10 +35,9 @@ Deno.serve(async (req) => {
     if (!refreshToken && !existing) throw new Error('missing_refresh_token');
     if (refreshToken) {
       const secret = { connection_id: connectionResult.data.id, refresh_token_ciphertext: await encryptToken(refreshToken), access_token_ciphertext: await encryptToken(token.access_token), access_token_expires_at: expiresAt, encryption_version: 1, rotated_at: new Date().toISOString() };
-      const { error: secretError } = await admin.schema('private').from('workspace_google_connection_secrets').upsert(secret);
+      const { error: secretError } = await admin.rpc('google_oauth_store_secret', { p_connection_id: secret.connection_id, p_refresh: secret.refresh_token_ciphertext, p_access: secret.access_token_ciphertext, p_expires_at: secret.access_token_expires_at });
       if (secretError) throw new Error('token_secret_save_failed');
     }
-    await admin.schema('private').from('workspace_google_oauth_states').delete().eq('state_hash', await sha256(state));
     await diagnostic(admin, { requestId, stage: 'connection_saved', outcome: 'succeeded', serviceArea, workspaceId, userId: stateRow.user_id });
     return redirect('connected', serviceArea);
   } catch (error) {
