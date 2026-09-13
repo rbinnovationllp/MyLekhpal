@@ -15,7 +15,7 @@ const plans = [
 ] as const;
 
 export default function PersonalWorkspace() {
-  const [households, setHouseholds] = useState<any[]>([]), [householdId, setHouseholdId] = useState(''), [name, setName] = useState(''), [planCode, setPlanCode] = useState('personal_plus_monthly');
+  const [households, setHouseholds] = useState<any[]>([]), [householdId, setHouseholdId] = useState(''), [name, setName] = useState(''), [planCode, setPlanCode] = useState('personal_basic_monthly');
   const [mode, setMode] = useState<(typeof modes)[number][0]>('statement_analysis'), [purposeConfirmed, setPurposeConfirmed] = useState(false), [text, setText] = useState(''), [googleDrive, setGoogleDrive] = useState<{ connected: boolean; email?: string }>({ connected: false }), [googleBusy, setGoogleBusy] = useState(false);
   const [file, setFile] = useState<File | null>(null), [busy, setBusy] = useState(false), [error, setError] = useState(''), [notice, setNotice] = useState(''), [result, setResult] = useState<any>(null);
   const uploadRef = useRef<HTMLInputElement>(null), cameraRef = useRef<HTMLInputElement>(null);
