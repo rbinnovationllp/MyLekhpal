@@ -130,6 +130,15 @@ export default function Workspace({ user }: { user: string }) {
     void loadBusinesses();
   }, []);
   useEffect(() => {
+    const callback = new URLSearchParams(window.location.search).get('google_drive');
+    if (!callback) return;
+    if (callback === 'connected') setNotice('Google Drive was connected successfully. MyLekhapal can now use the authorised Drive workspace.');
+    else setError('Google Drive connection was not completed. You can try again after checking the Google account and consent settings.');
+    const cleanUrl = new URL(window.location.href);
+    cleanUrl.searchParams.delete('google_drive');
+    window.history.replaceState({}, '', cleanUrl.pathname + cleanUrl.search + cleanUrl.hash);
+  }, []);
+  useEffect(() => {
     let valid = true;
     setData(null);
     setConfirmBusiness(false);
