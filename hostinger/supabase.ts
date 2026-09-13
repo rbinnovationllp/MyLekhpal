@@ -75,3 +75,14 @@ export async function googleDriveRequest(
   if (data?.error) throw new Error(data.error);
   return data;
 }
+
+export async function syncGoogleJournal(businessId: string) {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session?.access_token) return null;
+  const { data, error } = await supabase.functions.invoke('sync-google-journal', {
+    body: { businessId, accessToken: session.access_token },
+    headers: { Authorization: `Bearer ${session.access_token}` },
+  });
+  if (error || data?.error) return null;
+  return data;
+}

@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
-import { booksRequest, googleDriveRequest, prepareJournalDraft, startBusinessSubscription } from '../../hostinger/supabase';
+import { booksRequest, googleDriveRequest, prepareJournalDraft, startBusinessSubscription, syncGoogleJournal } from '../../hostinger/supabase';
 import {
   BookOpenCheck,
   Plus,
@@ -270,6 +270,8 @@ export default function Workspace({ user }: { user: string }) {
         lines,
         confirmBusiness,
       });
+      // This is automatic after a user saves: no second click or token is exposed to the browser.
+      const sync = await syncGoogleJournal(active);
       await refresh(active);
       form.reset();
       setLines([blankLine(), blankLine()]);
@@ -281,7 +283,7 @@ export default function Workspace({ user }: { user: string }) {
       setTab('journal');
       setNotice(
         t(
-          'Balanced journal draft saved. It has not been posted.',
+          sync?.connected ? `Balanced journal draft saved and synced to Google Sheets. It has not been posted.` : 'Balanced journal draft saved. It has not been posted.',
           'संतुलित जर्नल ड्राफ्ट सहेजा गया। इसे पोस्ट नहीं किया गया है।',
         ),
       );

@@ -9,6 +9,7 @@ import {
   ScanLine,
   CircleCheck,
 } from 'lucide-react';
+import { PublicAdoptionCounter } from '../components/public-adoption-counter';
 const money = (n: number) =>
   new Intl.NumberFormat('en-IN', {
     style: 'currency',
@@ -161,6 +162,7 @@ export default function Home() {
           </span>
         </div>
       </section>
+      <div className="wrap"><PublicAdoptionCounter /></div>
       <section className="section wrap" id="workflow">
         <div className="section-head">
           <div>

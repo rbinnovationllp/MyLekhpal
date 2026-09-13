@@ -132,6 +132,24 @@ svg {
   padding-top: 78px;
   padding-bottom: 92px;
 }
+.adoption-counter {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  margin: 0 auto 72px;
+  background: #d8e5e1;
+  border: 1px solid #d8e5e1;
+  border-radius: 16px;
+  overflow: hidden;
+}
+.adoption-counter > div { background: #f7fbf9; padding: 26px 24px; }
+.adoption-counter small { display: block; color: #597067; font-size: 11px; font-weight: 800; letter-spacing: 1px; }
+.adoption-counter strong { display: block; color: #123f36; font-size: clamp(28px, 3vw, 42px); margin: 9px 0 5px; }
+.adoption-counter span { color: #657b73; font-size: 13px; }
+.admin-analytics { padding-top: 58px; padding-bottom: 80px; }
+.admin-analytics h1 { font-size: clamp(38px, 5vw, 58px); }
+.admin-analytics table { width: 100%; border-collapse: collapse; }
+.admin-analytics th, .admin-analytics td { text-align: left; padding: 12px; border-bottom: 1px solid var(--border); }
 .eyebrow {
   font-size: 12px;
   font-weight: 700;
@@ -663,6 +681,10 @@ footer small {
   }
 }
 @media (max-width: 700px) {
+  .adoption-counter { grid-template-columns: 1fr 1fr; margin-bottom: 42px; }
+  .adoption-counter > div { padding: 20px 17px; }
+  .admin-analytics { padding-top: 30px; }
+  .admin-analytics .panel { overflow-x: auto; }
   .nav {
     height: 78px;
   }
