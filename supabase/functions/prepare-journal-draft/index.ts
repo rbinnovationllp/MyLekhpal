@@ -2,6 +2,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import * as XLSX from 'npm:xlsx@0.18.5';
 import { runProgressiveSkillAgent } from '../_shared/progressive-skill-agent.ts';
 import { repositoryFor } from '../_shared/skill-registry.ts';
+import { persistManagedDocument } from '../_shared/managed-document-storage.ts';
 
 type DraftInput = { businessId: string; sourceMethod: string; manualText?: string; file?: { name: string; type: string; base64: string } };
 type Account = { id: string; code: string; name: string; type: string };
@@ -73,7 +74,8 @@ Deno.serve(async (req) => {
     const accountIds = new Set(accounts.map((a) => a.id));
     const debit = draft.lines.reduce((n: number, x: { debit?: number }) => n + Number(x.debit || 0), 0), credit = draft.lines.reduce((n: number, x: { credit?: number }) => n + Number(x.credit || 0), 0);
     if (draft.lines.some((x: { account_id: string; debit?: number; credit?: number }) => !accountIds.has(x.account_id) || (Number(x.debit || 0) > 0) === (Number(x.credit || 0) > 0)) || Math.abs(debit - credit) > 0.01) return respond({ error: 'The proposed draft did not pass account or balance validation.', requestId }, 422, requestId, origin);
-    const { data: doc, error } = await admin.from('source_documents').insert({ business_id: input.businessId, doc_type: input.sourceMethod, storage_provider: 'ephemeral_processed_only', file_name: input.file?.name || 'manual-entry.txt', file_hash: sourceHash, extracted_fields: draft, ocr_confidence: draft.confidence, uploaded_by: user.id }).select('id').single();
+    const storedFile = input.file ? await persistManagedDocument(admin, 'business', input.businessId, input.file, sourceHash) : null;
+    const { data: doc, error } = await admin.from('source_documents').insert({ business_id: input.businessId, doc_type: input.sourceMethod, storage_provider: storedFile ? 'supabase_storage' : 'ephemeral_processed_only', storage_path: storedFile?.path || null, file_size_bytes: storedFile?.size || null, retention_status: storedFile?.retentionStatus || 'active', file_name: input.file?.name || 'manual-entry.txt', file_hash: sourceHash, extracted_fields: draft, ocr_confidence: draft.confidence, uploaded_by: user.id }).select('id').single();
     if (error) throw new Error('Could not record the processed source.');
     await admin.from('usage_records').insert([{ business_id: input.businessId, user_id: user.id, event_type: 'ai_document_processed', quantity: 1, estimated_cost: 0 }, { business_id: input.businessId, user_id: user.id, event_type: 'ai_tokens', quantity: agent.inputTokens + agent.outputTokens, estimated_cost: 0 }]);
     const skillAudit = {

@@ -86,3 +86,13 @@ export async function syncGoogleJournal(businessId: string) {
   if (error || data?.error) return null;
   return data;
 }
+
+export async function archiveBusinessJournalEntry(businessId: string, entryId: string) {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session?.access_token) return null;
+  const { data, error } = await supabase.functions.invoke('archive-business-journal-entry', {
+    body: { businessId, entryId, accessToken: session.access_token },
+    headers: { Authorization: `Bearer ${session.access_token}` },
+  });
+  return error || data?.error ? null : data;
+}

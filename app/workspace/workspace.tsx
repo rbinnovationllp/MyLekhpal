@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
-import { booksRequest, googleDriveRequest, prepareJournalDraft, startBusinessSubscription, syncGoogleJournal } from '../../hostinger/supabase';
+import { archiveBusinessJournalEntry, booksRequest, googleDriveRequest, prepareJournalDraft, startBusinessSubscription, syncGoogleJournal } from '../../hostinger/supabase';
 import {
   BookOpenCheck,
   Plus,
@@ -263,13 +263,14 @@ export default function Workspace({ user }: { user: string }) {
     setBusy(true);
     try {
       const fields = Object.fromEntries(new FormData(form));
-      await request('/api/books', {
+      const saved = await request('/api/books', {
         ...fields,
         action: 'createEntry',
         business: active,
         lines,
         confirmBusiness,
       });
+      if (saved?.id) await archiveBusinessJournalEntry(active, saved.id);
       // This is automatic after a user saves: no second click or token is exposed to the browser.
       const sync = await syncGoogleJournal(active);
       await refresh(active);

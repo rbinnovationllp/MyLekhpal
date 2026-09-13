@@ -2,6 +2,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import * as XLSX from 'npm:xlsx@0.18.5';
 import { runProgressiveSkillAgent } from '../_shared/progressive-skill-agent.ts';
 import { repositoryFor } from '../_shared/skill-registry.ts';
+import { persistManagedDocument } from '../_shared/managed-document-storage.ts';
 
 type FileInput = { name: string; type: string; base64: string };
 type Input = {
@@ -95,7 +96,8 @@ Deno.serve(async (req) => {
     });
     const requestId = agent.requestId, draft = agent.draft;
     if (!draft || !Array.isArray(draft.transactions)) throw new Error('Model response did not match the personal-finance draft schema.');
-    const document = input.file ? await admin.from('personal_documents').insert({ household_id: input.householdId, uploaded_by: user.id, document_type: input.serviceMode === 'department_notice' ? 'department_notice' : input.serviceMode === 'tax_intake' ? 'tax_document' : 'bank_statement', storage_provider: 'ephemeral_processed_only', file_name: input.file.name, file_hash: inputHash, masked_metadata: { filename: input.file.name.replace(/\d{5,}/g, 'XXXX') }, processing_status: 'ready_for_review' }).select('id').single() : { data: null };
+    const storedFile = input.file ? await persistManagedDocument(admin, 'personal', input.householdId, input.file, inputHash) : null;
+    const document = input.file ? await admin.from('personal_documents').insert({ household_id: input.householdId, uploaded_by: user.id, document_type: input.serviceMode === 'department_notice' ? 'department_notice' : input.serviceMode === 'tax_intake' ? 'tax_document' : 'bank_statement', storage_provider: storedFile ? 'supabase_storage' : 'ephemeral_processed_only', storage_path: storedFile?.path || null, file_size_bytes: storedFile?.size || null, retention_status: storedFile?.retentionStatus || 'active', file_name: input.file.name, file_hash: inputHash, masked_metadata: { filename: input.file.name.replace(/\d{5,}/g, 'XXXX') }, processing_status: 'ready_for_review' }).select('id').single() : { data: null };
     const status = draft.professional_review_required ? 'pending_professional_review' : draft.clarifications.length ? 'pending_clarification' : 'draft';
     const { data: storedDraft, error: draftError } = await admin.from('personal_finance_drafts').insert({ household_id: input.householdId, source_document_id: document.data?.id || null, created_by: user.id, service_mode: input.serviceMode, status, confidence: draft.confidence_level, structured_output: draft }).select('id,status,confidence,created_at').single();
     if (draftError || !storedDraft) throw new Error('Could not record the prepared draft.');
