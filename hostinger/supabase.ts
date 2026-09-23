@@ -37,8 +37,13 @@ export async function booksRequest(url: string, body?: unknown) {
 }
 
 export async function prepareJournalDraft(payload: unknown) {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session?.access_token) throw new Error('Your sign-in session has expired. Please sign in again.');
+  const body = typeof payload === 'object' && payload !== null
+    ? { ...payload as Record<string, unknown>, accessToken: session.access_token }
+    : payload;
   const { data, error } = await withTimeout(
-    supabase.functions.invoke('prepare-journal-draft', { body: payload }),
+    supabase.functions.invoke('prepare-journal-draft', { body, headers: { Authorization: `Bearer ${session.access_token}` } }),
     180_000,
     'Preparing the journal batch timed out. The selected file remains available; retry once and report the reference shown in any error.'
   );

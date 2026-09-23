@@ -100,6 +100,7 @@ export default function Workspace({ user }: { user: string }) {
     [aiDraft, setAiDraft] = useState<any>(null),
     [aiBatch, setAiBatch] = useState<any>(null),
     [aiBusy, setAiBusy] = useState(false),
+    [analysisError, setAnalysisError] = useState(''),
     [googleDrive, setGoogleDrive] = useState<{ connected: boolean; email?: string }>({ connected: false }),
     [googleBusy, setGoogleBusy] = useState(false),
     [googleTargetMode, setGoogleTargetMode] = useState<'client_owned' | 'company_owned'>('client_owned'),
@@ -107,6 +108,7 @@ export default function Workspace({ user }: { user: string }) {
     [googleConsent, setGoogleConsent] = useState(false),
     [subscriptionBusy, setSubscriptionBusy] = useState(false),
     [businessPlan, setBusinessPlan] = useState('small_business_monthly'),
+    [showOnboardingGuide, setShowOnboardingGuide] = useState(false),
     [hi, setHi] = useState(false);
   const uploadRef = useRef<HTMLInputElement>(null);
   const cameraRef = useRef<HTMLInputElement>(null);
@@ -151,6 +153,7 @@ export default function Workspace({ user }: { user: string }) {
     setImported(null);
     setImportFile(null);
     setAiDraft(null);
+    setAnalysisError('');
     setDetail(null);
     if (active) {
       setLoading(true);
@@ -341,6 +344,7 @@ export default function Workspace({ user }: { user: string }) {
   }
   async function readImport(file: File) {
     setImportFile(file);
+    setAnalysisError('');
     const image = file.type.startsWith('image/');
     const spreadsheet = /\.(csv|xlsx?|xls)$/i.test(file.name) || file.type.includes('csv') || file.type.includes('spreadsheet') || file.type.includes('excel');
     const base: ImportResult = { name: file.name, kind: image ? 'image' : spreadsheet ? 'spreadsheet' : 'document', preview: image ? URL.createObjectURL(file) : undefined, date: '', reference: '', party: '', description: '', taxableAmount: '', gst: '', total: '', missing: [] };
@@ -366,7 +370,7 @@ export default function Workspace({ user }: { user: string }) {
     await analyseWithClaude(file, spreadsheet ? 'excel_csv_import' : image ? 'invoice_upload' : 'receipt_upload');
   }
   async function analyseWithClaude(file: File, sourceMethod: string) {
-    setAiBusy(true); setError(''); setAiDraft(null); setAiBatch(null);
+    setAiBusy(true); setError(''); setAnalysisError(''); setAiDraft(null); setAiBatch(null);
     try {
       const base64 = await new Promise<string>((resolve, reject) => { const reader = new FileReader(); reader.onerror = () => reject(new Error('Unable to read the selected file.')); reader.onload = () => resolve(String(reader.result).split(',')[1] || ''); reader.readAsDataURL(file); });
       const result = await prepareJournalDraft({ businessId: active, sourceMethod, file: { name: file.name, type: file.type, base64 } });
@@ -388,7 +392,11 @@ export default function Workspace({ user }: { user: string }) {
       setAiDraft({ ...draft, model: result.model, requestId: result.requestId, skill: result.skill });
       setImported((current) => current ? { ...current, date: draft.transaction_date || '', reference: draft.reference || '', party: draft.party_name || '', description: draft.narration || current.description, taxableAmount: draft.taxable_amount == null ? '' : String(draft.taxable_amount), gst: draft.gst_amount == null ? '' : String(draft.gst_amount), total: draft.total_amount == null ? '' : String(draft.total_amount), missing: (draft.completeness || []).filter((item: any) => ['missing', 'invalid', 'inconsistent', 'pending_professional_review'].includes(item.status)).map((item: any) => item.field) } : current);
       setNotice(t(`MyLekhapal Intelligence prepared a ${draft.status} draft. Review required before saving.`, `MyLekhapal Intelligence ने ${draft.status} ड्राफ्ट तैयार किया। सहेजने से पहले समीक्षा आवश्यक है।`));
-    } catch (reason: any) { setError(reason?.message || t('We could not prepare a journal draft. Please try again.', 'जर्नल ड्राफ्ट तैयार नहीं हो सका। कृपया पुनः प्रयास करें।')); }
+    } catch (reason: any) {
+      const message = reason?.message || t('We could not prepare a journal draft. Please try again.', 'जर्नल ड्राफ्ट तैयार नहीं हो सका। कृपया पुनः प्रयास करें।');
+      setAnalysisError(message);
+      setError(message);
+    }
     finally { setAiBusy(false); }
   }
   function downloadBatchWorkbook() {
@@ -682,10 +690,29 @@ export default function Workspace({ user }: { user: string }) {
                   {data.business.year}–{String(data.business.year + 1).slice(2)}
                 </b>
               </div>
-              <span className="pill">
-                {t('Onboarding draft', 'सेटअप ड्राफ्ट')}
-              </span>
+              {String(data.business.status || '').toLowerCase() === 'onboarding draft' ? (
+                <button className="pill" type="button" onClick={() => setShowOnboardingGuide((open) => !open)}>
+                  {t('Complete setup', 'सेटअप पूरा करें')}
+                </button>
+              ) : (
+                <span className="pill">{String(data.business.status || t('Active', 'सक्रिय'))}</span>
+              )}
             </div>
+            {showOnboardingGuide && String(data.business.status || '').toLowerCase() === 'onboarding draft' && (
+              <section className="panel onboarding-guide" aria-label="Business setup guide">
+                <div className="section-heading"><div><span className="eyebrow">BUSINESS SETUP</span><h2>{t('Your workspace is ready to use', 'आपका कार्यक्षेत्र उपयोग के लिए तैयार है')}</h2></div></div>
+                <p>{t('Finish these practical steps whenever you are ready. Your existing records remain separate and no journal is posted automatically.', 'इन व्यावहारिक चरणों को अपनी सुविधा से पूरा करें। आपके रिकॉर्ड अलग रहते हैं और कोई जर्नल अपने-आप पोस्ट नहीं होता।')}</p>
+                <ol>
+                  <li>{t('Choose the Google Sheets delivery location above if you want journal entries synchronised to Google.', 'यदि आप जर्नल प्रविष्टियों को Google में सिंक करना चाहते हैं तो ऊपर Google Sheets डिलीवरी स्थान चुनें।')}</li>
+                  <li>{t('Review the starter chart of accounts for this business.', 'इस व्यवसाय के लिए प्रारंभिक खातों की सूची देखें।')}</li>
+                  <li>{t('Create or upload your first reviewable journal draft.', 'अपना पहला समीक्षा योग्य जर्नल ड्राफ्ट बनाएं या अपलोड करें।')}</li>
+                </ol>
+                <div className="workspace-actions">
+                  <button className="button small" type="button" onClick={() => { setTab('accounts'); setShowOnboardingGuide(false); }}>{t('Review accounts', 'खाते देखें')}</button>
+                  <button className="quiet" type="button" onClick={() => { setTab('new'); setShowOnboardingGuide(false); }}>{t('Create journal draft', 'जर्नल ड्राफ्ट बनाएं')}</button>
+                </div>
+              </section>
+            )}
             <Tabs value={tab} onValueChange={(v) => setTab(String(v))}>
               <TabsList className="workspace-tabs">
                 <TabsTrigger value="overview">
@@ -914,11 +941,11 @@ export default function Workspace({ user }: { user: string }) {
                       <div className="import-preview">
                         {imported.preview ? <img src={imported.preview} alt={`Preview of ${imported.name}`} /> : imported.kind === 'spreadsheet' ? <FileSpreadsheet aria-hidden="true" /> : <FileText aria-hidden="true" />}
                         <span>{imported.name}</span>
-                        <button type="button" className="quiet" aria-label={t('Remove document', 'दस्तावेज़ हटाएँ')} onClick={() => { if (imported.preview) URL.revokeObjectURL(imported.preview); setImported(null); setImportFile(null); }}><X size={18} /></button>
+                        <button type="button" className="quiet" aria-label={t('Remove document', 'दस्तावेज़ हटाएँ')} onClick={() => { if (imported.preview) URL.revokeObjectURL(imported.preview); setImported(null); setImportFile(null); setAiDraft(null); setAiBatch(null); setAnalysisError(''); }}><X size={18} /></button>
                       </div>
                       <div className="extraction-status">
                         {imported.kind === 'spreadsheet' ? <CheckCircle2 size={18} /> : <AlertTriangle size={18} />}
-                        <div><b>{aiBusy ? t('Preparing your journal draft', 'आपका जर्नल ड्राफ्ट तैयार हो रहा है') : aiDraft ? t('Review required', 'समीक्षा आवश्यक') : t('Document selected', 'दस्तावेज़ चुना गया')}</b><span>{aiBusy ? t('MyLekhapal Intelligence is checking details, GST treatment, accounts and debits/credits.', 'MyLekhapal Intelligence विवरण, GST, खाते और डेबिट/क्रेडिट की जाँच कर रहा है।') : aiDraft ? t('Details below are a draft only. Correct anything uncertain before you save.', 'नीचे के विवरण केवल ड्राफ्ट हैं। सहेजने से पहले अनिश्चित जानकारी सुधारें।') : t('Processing starts automatically after a supported document is selected.', 'समर्थित दस्तावेज़ चुनते ही प्रोसेसिंग अपने-आप शुरू होती है।')}</span></div>
+                        <div><b>{aiBusy ? t('Preparing your journal draft', 'आपका जर्नल ड्राफ्ट तैयार हो रहा है') : analysisError ? t('Analysis could not be completed', 'विश्लेषण पूरा नहीं हो सका') : aiDraft ? t('Review required', 'समीक्षा आवश्यक') : t('Document selected', 'दस्तावेज़ चुना गया')}</b><span>{aiBusy ? t('MyLekhapal Intelligence is checking details, GST treatment, accounts and debits/credits.', 'MyLekhapal Intelligence विवरण, GST, खाते और डेबिट/क्रेडिट की जाँच कर रहा है।') : analysisError ? analysisError : aiDraft ? t('Details below are a draft only. Correct anything uncertain before you save.', 'नीचे के विवरण केवल ड्राफ्ट हैं। सहेजने से पहले अनिश्चित जानकारी सुधारें।') : t('The file is ready. Analysis will begin automatically.', 'फ़ाइल तैयार है। विश्लेषण अपने-आप शुरू होगा।')}</span></div>
                       </div>
                       <div className="extracted-grid">
                         <span><small>{t('Date', 'तारीख')}</small><b>{imported.date || '—'}</b></span>
@@ -931,6 +958,7 @@ export default function Workspace({ user }: { user: string }) {
                       {imported.missing.length > 0 && <p className="missing"><AlertTriangle size={16} /> {t('Needs your attention:', 'आपका ध्यान आवश्यक:')} {imported.missing.join(', ')}</p>}
                       {aiDraft?.clarifications?.length > 0 && <p className="missing"><AlertTriangle size={16} /> {t('More information is needed:', 'अधिक जानकारी आवश्यक है:')} {aiDraft.clarifications.join(', ')}</p>}
                       {aiDraft?.exceptions?.length > 0 && <p className="missing"><AlertTriangle size={16} /> {t('Review flags:', 'समीक्षा संकेत:')} {aiDraft.exceptions.join(', ')}</p>}
+                      {analysisError && importFile && !aiBusy && <button type="button" className="button small" onClick={() => void analyseWithClaude(importFile, imported.kind === 'spreadsheet' ? 'excel_csv_import' : imported.kind === 'image' ? 'invoice_upload' : 'receipt_upload')}>Retry journal analysis</button>}
                       {aiBatch && <section className="batch-result" aria-label="Prepared journal batch">
                         <div><b>{aiBatch.entries?.length || 0} of {aiBatch.rowsFound || 0} rows prepared</b><span> Each row remains a draft. Review account mapping, GST/TDS flags and exceptions before saving or posting.</span></div>
                         <button type="button" className="button small" onClick={downloadBatchWorkbook}><Download size={16} /> Download draft journal Excel</button>
@@ -1085,14 +1113,14 @@ export default function Workspace({ user }: { user: string }) {
                     </label>
                     <button
                       className="button"
-                      disabled={busy || aiBusy || !confirmBusiness || Boolean(importFile && !aiDraft)}
+                      disabled={busy || aiBusy || !confirmBusiness}
                     >
                       {busy
                         ? t('Saving…', 'सहेज रहे हैं…')
                         : aiBusy
                           ? t('Preparing your journal draft…', 'आपका जर्नल ड्राफ्ट तैयार हो रहा है…')
-                        : importFile && !aiDraft
-                          ? t('Waiting for journal analysis…', 'जर्नल विश्लेषण की प्रतीक्षा है…')
+                        : analysisError
+                          ? t('Save manual draft while analysis is unavailable', 'विश्लेषण उपलब्ध न होने पर मैन्युअल ड्राफ्ट सहेजें')
                         : t('Save balanced draft', 'संतुलित ड्राफ्ट सहेजें')}
                     </button>
                   </form>
