@@ -116,9 +116,11 @@ Deno.serve(async (req: Request) => {
       scope: scopes.join(' '),
       state,
       access_type: 'offline',
-      prompt: 'consent',
       include_granted_scopes: 'true',
     }).toString();
+    // Force a consent screen only for a first connection or genuine re-authorisation.
+    // A healthy existing connection returns above and is not sent through OAuth again.
+    if (!connection || connection.sync_status !== 'connected') url.searchParams.set('prompt', 'consent');
 
     await diagnostic(admin, {
       requestId,
@@ -132,7 +134,7 @@ Deno.serve(async (req: Request) => {
     return reply({ authorizationUrl: url.toString() }, 200, origin);
   } catch (error) {
     const code = error instanceof Error ? error.message : 'unexpected_error';
-    console.error('google_oauth_connect_failed', { requestId, code, error });
+    console.error('google_oauth_connect_failed', { requestId, code });
 
     try {
       await diagnostic(adminClient(), {

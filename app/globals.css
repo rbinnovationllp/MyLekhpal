@@ -830,6 +830,11 @@ footer small {
 }
 .workspace-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
 .drive-button { border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; color: #175c4b; background: #f5fbf7; font-weight: 700; }
+.batch-result { margin-top: 16px; padding: 16px; border: 1px solid #cbe4d7; background: #f7fcf9; border-radius: 10px; }
+.batch-result > div:first-child { display: flex; flex-direction: column; gap: 5px; margin-bottom: 12px; }
+.batch-table-wrap { max-height: 300px; overflow: auto; margin-top: 14px; border: 1px solid var(--border); border-radius: 7px; background: #fff; }
+.batch-table-wrap table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.batch-table-wrap th, .batch-table-wrap td { padding: 9px; text-align: left; border-bottom: 1px solid var(--border); }
 .personal-draft .toolbar {
   display: flex;
   align-items: end;

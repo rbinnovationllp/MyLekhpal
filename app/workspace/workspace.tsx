@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
-import { archiveBusinessJournalEntry, booksRequest, googleDriveRequest, prepareJournalDraft, startBusinessSubscription, syncGoogleJournal } from '../../hostinger/supabase';
+import { archiveBusinessJournalEntry, booksRequest, configureGoogleJournalTarget, googleDriveRequest, prepareJournalDraft, startBusinessSubscription, syncGoogleJournal } from '../../hostinger/supabase';
 import {
   BookOpenCheck,
   Plus,
@@ -98,9 +98,13 @@ export default function Workspace({ user }: { user: string }) {
     [imported, setImported] = useState<ImportResult | null>(null),
     [importFile, setImportFile] = useState<File | null>(null),
     [aiDraft, setAiDraft] = useState<any>(null),
+    [aiBatch, setAiBatch] = useState<any>(null),
     [aiBusy, setAiBusy] = useState(false),
     [googleDrive, setGoogleDrive] = useState<{ connected: boolean; email?: string }>({ connected: false }),
     [googleBusy, setGoogleBusy] = useState(false),
+    [googleTargetMode, setGoogleTargetMode] = useState<'client_owned' | 'company_owned'>('client_owned'),
+    [googleSpreadsheet, setGoogleSpreadsheet] = useState(''),
+    [googleConsent, setGoogleConsent] = useState(false),
     [subscriptionBusy, setSubscriptionBusy] = useState(false),
     [businessPlan, setBusinessPlan] = useState('small_business_monthly'),
     [hi, setHi] = useState(false);
@@ -182,6 +186,21 @@ export default function Workspace({ user }: { user: string }) {
       if (!result.authorizationUrl) throw new Error('The secure Google authorisation link was unavailable.');
       window.location.assign(result.authorizationUrl);
     } catch (reason: any) { setError(reason.message || 'Unable to start the secure Google Drive connection.'); }
+    finally { setGoogleBusy(false); }
+  }
+  async function saveGoogleDelivery() {
+    if (!active) return;
+    setGoogleBusy(true); setError(''); setNotice('');
+    try {
+      const result = await configureGoogleJournalTarget(active, googleTargetMode, googleSpreadsheet, googleConsent);
+      if (result.needsGoogleAuthorisation && !googleDrive.connected) {
+        setNotice('Delivery preference saved. Continue with the secure Google consent screen to connect the client-owned sheet.');
+        await connectGoogleDrive();
+        return;
+      }
+      const sync = await syncGoogleJournal(active);
+      setNotice(sync?.message || (googleTargetMode === 'company_owned' ? 'Company Google Drive destination was created and linked to this business.' : 'Client-owned Google Sheet delivery was saved.'));
+    } catch (reason: any) { setError(reason.message || 'Unable to save Google Sheets delivery settings.'); }
     finally { setGoogleBusy(false); }
   }
   async function authoriseBusinessPlan() {
@@ -343,13 +362,26 @@ export default function Workspace({ user }: { user: string }) {
       base.missing = ['Transaction date', 'Reference number', 'Party', 'Taxable amount', 'GST', 'Total amount'];
     }
     setImported(base);
+    setAiBatch(null);
     await analyseWithClaude(file, spreadsheet ? 'excel_csv_import' : image ? 'invoice_upload' : 'receipt_upload');
   }
   async function analyseWithClaude(file: File, sourceMethod: string) {
-    setAiBusy(true); setError(''); setAiDraft(null);
+    setAiBusy(true); setError(''); setAiDraft(null); setAiBatch(null);
     try {
       const base64 = await new Promise<string>((resolve, reject) => { const reader = new FileReader(); reader.onerror = () => reject(new Error('Unable to read the selected file.')); reader.onload = () => resolve(String(reader.result).split(',')[1] || ''); reader.readAsDataURL(file); });
       const result = await prepareJournalDraft({ businessId: active, sourceMethod, file: { name: file.name, type: file.type, base64 } });
+      if (result.batch) {
+        const batch = result.batch;
+        const first = batch.entries?.[0];
+        if (first) {
+          setJournal({ date: first.transaction_date || '', reference: first.reference || '', narration: first.narration || '' });
+          setLines(first.lines.map((line: any) => ({ account: line.account_id, debit: line.debit ? String(line.debit) : '', credit: line.credit ? String(line.credit) : '' })));
+          setAiDraft(first);
+        }
+        setAiBatch(batch);
+        setNotice(t(`Prepared ${batch.entries?.length || 0} of ${batch.rowsFound || 0} spreadsheet rows as reviewable drafts. Download the Excel batch for client/CA review.`, `${batch.rowsFound || 0} में से ${batch.entries?.length || 0} पंक्तियों के समीक्षा योग्य ड्राफ्ट तैयार किए गए।`));
+        return;
+      }
       const draft = result.draft;
       setJournal({ date: draft.transaction_date || '', reference: draft.reference || '', narration: draft.narration || '' });
       setLines(draft.lines.map((line: any) => ({ account: line.account_id, debit: line.debit ? String(line.debit) : '', credit: line.credit ? String(line.credit) : '' })));
@@ -358,6 +390,14 @@ export default function Workspace({ user }: { user: string }) {
       setNotice(t(`MyLekhapal Intelligence prepared a ${draft.status} draft. Review required before saving.`, `MyLekhapal Intelligence ने ${draft.status} ड्राफ्ट तैयार किया। सहेजने से पहले समीक्षा आवश्यक है।`));
     } catch (reason: any) { setError(reason?.message || t('We could not prepare a journal draft. Please try again.', 'जर्नल ड्राफ्ट तैयार नहीं हो सका। कृपया पुनः प्रयास करें।')); }
     finally { setAiBusy(false); }
+  }
+  function downloadBatchWorkbook() {
+    if (!aiBatch?.workbookBase64) return;
+    const binary = atob(aiBatch.workbookBase64);
+    const bytes = Uint8Array.from(binary, (char) => char.charCodeAt(0));
+    const href = URL.createObjectURL(new Blob([bytes], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }));
+    const link = document.createElement('a'); link.href = href; link.download = aiBatch.workbookFilename || 'Draft_Journal_Entries.xlsx'; link.click();
+    setTimeout(() => URL.revokeObjectURL(href), 1000);
   }
   function exportCsv() {
     const rows = [
@@ -464,6 +504,27 @@ export default function Workspace({ user }: { user: string }) {
             </button>
           </div>
         </div>
+        {active && (
+          <section className="panel" aria-label="Google Sheets journal delivery">
+            <div className="section-heading">
+              <div><span className="eyebrow">GOOGLE SHEETS JOURNAL DELIVERY</span><h2>Choose where this business keeps its journal</h2></div>
+            </div>
+            <p className="muted">Choose one secure destination per business. Entries are appended using the saved business mapping; MyLekhapal never searches Drive by client name.</p>
+            <div className="form-grid">
+              <label>Journal location
+                <select value={googleTargetMode} onChange={(event) => setGoogleTargetMode(event.target.value as 'client_owned' | 'company_owned')}>
+                  <option value="client_owned">Client-owned Google Sheet</option>
+                  <option value="company_owned">Company-managed MyLekhapal Drive folder</option>
+                </select>
+              </label>
+              {googleTargetMode === 'client_owned' && <label>Existing spreadsheet URL or ID (optional)
+                <input value={googleSpreadsheet} onChange={(event) => setGoogleSpreadsheet(event.target.value)} placeholder="https://docs.google.com/spreadsheets/d/..." />
+              </label>}
+            </div>
+            <label className="check-row"><input type="checkbox" checked={googleConsent} onChange={(event) => setGoogleConsent(event.target.checked)} /> I consent to MyLekhapal saving this business’s journal entries in the selected Google Sheets location. I can change or revoke this connection later.</label>
+            <button className="button small" disabled={googleBusy || !googleConsent} onClick={saveGoogleDelivery}>{googleBusy ? 'Saving Google delivery…' : 'Save Google Sheets delivery'}</button>
+          </section>
+        )}
         {businesses.length > 0 && (
           <div className="business-switch">
             <label>{t('Active business', 'चयनित व्यवसाय')}</label>
@@ -870,6 +931,12 @@ export default function Workspace({ user }: { user: string }) {
                       {imported.missing.length > 0 && <p className="missing"><AlertTriangle size={16} /> {t('Needs your attention:', 'आपका ध्यान आवश्यक:')} {imported.missing.join(', ')}</p>}
                       {aiDraft?.clarifications?.length > 0 && <p className="missing"><AlertTriangle size={16} /> {t('More information is needed:', 'अधिक जानकारी आवश्यक है:')} {aiDraft.clarifications.join(', ')}</p>}
                       {aiDraft?.exceptions?.length > 0 && <p className="missing"><AlertTriangle size={16} /> {t('Review flags:', 'समीक्षा संकेत:')} {aiDraft.exceptions.join(', ')}</p>}
+                      {aiBatch && <section className="batch-result" aria-label="Prepared journal batch">
+                        <div><b>{aiBatch.entries?.length || 0} of {aiBatch.rowsFound || 0} rows prepared</b><span> Each row remains a draft. Review account mapping, GST/TDS flags and exceptions before saving or posting.</span></div>
+                        <button type="button" className="button small" onClick={downloadBatchWorkbook}><Download size={16} /> Download draft journal Excel</button>
+                        {aiBatch.exceptions?.length > 0 && <p className="missing"><AlertTriangle size={16} /> {aiBatch.exceptions.join(' ')}</p>}
+                        <div className="batch-table-wrap"><table><thead><tr><th>Source row</th><th>Date</th><th>Party</th><th>Draft status</th><th>Confidence</th></tr></thead><tbody>{(aiBatch.entries || []).map((entry: any, index: number) => <tr key={`${entry.source_row_number}-${index}`}><td>{entry.source_row_number}</td><td>{entry.transaction_date || '—'}</td><td>{entry.party_name || '—'}</td><td>{entry.status}</td><td>{entry.confidence}</td></tr>)}</tbody></table></div>
+                      </section>}
                       {aiBusy && <p role="status" className="helper">{t('MyLekhapal Intelligence is preparing a draft…', 'MyLekhapal Intelligence ड्राफ्ट तैयार कर रहा है…')}</p>}
                     </div>}
                   </div>

@@ -37,9 +37,11 @@ export async function booksRequest(url: string, body?: unknown) {
 }
 
 export async function prepareJournalDraft(payload: unknown) {
-  const { data, error } = await supabase.functions.invoke('prepare-journal-draft', {
-    body: payload,
-  });
+  const { data, error } = await withTimeout(
+    supabase.functions.invoke('prepare-journal-draft', { body: payload }),
+    180_000,
+    'Preparing the journal batch timed out. The selected file remains available; retry once and report the reference shown in any error.'
+  );
   if (error) throw await edgeFunctionError(error, 'Journal draft preparation is unavailable.');
   if (data?.error) throw new Error(data.error);
   return data;
@@ -101,6 +103,19 @@ export async function syncGoogleJournal(businessId: string) {
     headers: { Authorization: `Bearer ${session.access_token}` },
   });
   if (error || data?.error) return null;
+  return data;
+}
+
+export async function configureGoogleJournalTarget(businessId: string, mode: 'client_owned' | 'company_owned', spreadsheetId: string | undefined, consent: boolean) {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session?.access_token) throw new Error('Your sign-in session has expired. Please sign in again.');
+  const normalized = spreadsheetId?.trim().match(/[-\w]{20,}/)?.[0] || undefined;
+  const { data, error } = await supabase.functions.invoke('configure-google-journal-target', {
+    body: { businessId, mode, spreadsheetId: normalized, consent, accessToken: session.access_token },
+    headers: { Authorization: `Bearer ${session.access_token}` },
+  });
+  if (error) throw await edgeFunctionError(error, 'Unable to save Google Sheets delivery settings.');
+  if (data?.error) throw new Error(data.error);
   return data;
 }
 
