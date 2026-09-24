@@ -1,10 +1,10 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import * as XLSX from 'npm:xlsx@0.18.5';
-import { runProgressiveSkillAgent } from '../_shared/progressive-skill-agent.ts';
+import { runLoadedSkillOnce, runProgressiveSkillAgent } from '../_shared/progressive-skill-agent.ts';
 import { repositoryFor } from '../_shared/skill-registry.ts';
 import { persistManagedDocument } from '../_shared/managed-document-storage.ts';
 
-type DraftInput = { businessId: string; sourceMethod: string; manualText?: string; file?: { name: string; type: string; base64: string } };
+type DraftInput = { businessId: string; sourceMethod: string; manualText?: string; file?: { name: string; type: string; base64: string }; accessToken?: string };
 type Account = { id: string; code: string; name: string; type: string };
 const headers = { 'content-type': 'application/json', 'cache-control': 'no-store' };
 const origins = new Set(['https://mylekhpal.com', 'https://www.mylekhpal.com', 'http://localhost:5173']);
@@ -75,6 +75,15 @@ function validLines(lines: any[], accountIds: Set<string>) {
   const credit = lines.reduce((total, line) => total + Number(line.credit || 0), 0);
   return lines.length >= 2 && lines.every((line) => accountIds.has(line.account_id) && ((Number(line.debit || 0) > 0) !== (Number(line.credit || 0) > 0))) && Math.abs(debit - credit) <= 0.01;
 }
+function canonicalLines(lines: any[], accounts: Account[]) {
+  const accountByAlias = new Map<string, string>();
+  for (const account of accounts) {
+    accountByAlias.set(normal(account.id), account.id);
+    accountByAlias.set(normal(account.code), account.id);
+    accountByAlias.set(normal(account.name), account.id);
+  }
+  return lines.map((line) => ({ ...line, account_id: accountByAlias.get(normal(line.account_id)) || line.account_id }));
+}
 function batchWorkbook(entries: any[], accounts: Account[]) {
   const accountName = new Map(accounts.map((account) => [account.id, account.name]));
   const workbook = XLSX.utils.book_new();
@@ -103,25 +112,31 @@ Deno.serve(async (req) => {
   if (origin && !origins.has(origin)) return respond({ error: 'Request origin rejected.' }, 403, undefined, origin);
   const operationId = crypto.randomUUID();
   try {
-    const authorization = req.headers.get('authorization');
-    if (!authorization) return respond({ error: 'Sign in to continue.' }, 401, undefined, origin);
     const input = await req.json() as DraftInput;
+    // Some browser/proxy combinations can omit a custom Authorization header on
+    // a cross-origin Edge Function invocation. The same short-lived user JWT is
+    // supplied by the authenticated frontend body as a controlled fallback.
+    const authorization = req.headers.get('authorization') || (input.accessToken ? `Bearer ${input.accessToken}` : '');
+    if (!authorization.startsWith('Bearer ')) return respond({ error: 'Your secure sign-in token was not received. Sign out, sign in again, then retry.' }, 401, undefined, origin);
     if (!input.businessId || (!input.manualText && !input.file)) return respond({ error: 'A business and transaction text or document are required.' }, 400, undefined, origin);
     if (input.file && input.file.base64.length > 7_000_000) return respond({ error: 'Maximum file size is 5 MB.' }, 413, undefined, origin);
-    const url = Deno.env.get('SUPABASE_URL')!, anon = Deno.env.get('SUPABASE_ANON_KEY')!, service = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const userDb = createClient(url, anon, { global: { headers: { authorization } } });
-    const { data: { user } } = await userDb.auth.getUser();
-    if (!user) return respond({ error: 'Sign in to continue.' }, 401, undefined, origin);
-    const { data: member } = await userDb.from('business_memberships').select('role').eq('business_id', input.businessId).eq('user_id', user.id).eq('status', 'active').maybeSingle();
+    const url = Deno.env.get('SUPABASE_URL')!, service = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    if (!url || !service) throw new Error('server_auth_configuration_missing');
+    const admin = createClient(url, service);
+    const { data: { user } } = await admin.auth.getUser(authorization.slice(7));
+    if (!user) return respond({ error: 'Your secure sign-in token could not be verified. Sign out, sign in again, then retry.' }, 401, undefined, origin);
+    const { data: member } = await admin.from('business_memberships').select('role').eq('business_id', input.businessId).eq('user_id', user.id).eq('status', 'active').maybeSingle();
     if (!member || member.role === 'auditor') return respond({ error: 'Your role cannot prepare drafts.' }, 403, undefined, origin);
-    const { data: writeAllowed } = await userDb.rpc('mylekhpal_write_access', { target_business: input.businessId });
-    if (!writeAllowed) return respond({ error: 'This workspace is currently read-only. You can still view and download your records.' }, 403, undefined, origin);
+    const { data: subscription } = await admin.from('business_subscriptions').select('status,trial_ends_at,payment_due_at').eq('business_id', input.businessId).maybeSingle();
+    const now = Date.now(), trialExpired = subscription?.status === 'trial' && subscription.trial_ends_at && new Date(subscription.trial_ends_at).getTime() <= now;
+    const paymentGraceExpired = subscription?.payment_due_at && new Date(subscription.payment_due_at).getTime() + 7 * 24 * 60 * 60 * 1000 <= now;
+    if (!subscription || trialExpired || paymentGraceExpired || subscription.status === 'restricted_read_only' || !['trial', 'active', 'payment_due'].includes(subscription.status)) return respond({ error: 'This workspace is currently read-only. You can still view and download your records.' }, 403, undefined, origin);
     const [{ data: accounts }, { data: business }] = await Promise.all([
-      userDb.from('chart_of_accounts').select('id,code,name,type').eq('business_id', input.businessId).eq('is_active', true),
-      userDb.from('businesses').select('legal_name,display_name,pan,gstins,workspace_settings').eq('id', input.businessId).single(),
+      admin.from('chart_of_accounts').select('id,code,name,type').eq('business_id', input.businessId).eq('is_active', true),
+      admin.from('businesses').select('legal_name,display_name,pan,gstins,workspace_settings').eq('id', input.businessId).single(),
     ]);
     if (!accounts?.length || !business) return respond({ error: 'The active business or its chart of accounts is unavailable.' }, 422, undefined, origin);
-    const admin = createClient(url, service), sourceHash = await hash(input.file?.base64 || input.manualText || '');
+    const sourceHash = await hash(input.file?.base64 || input.manualText || '');
     // Raw uploads are retained at the company only after the business explicitly
     // selected the company-managed Google/records destination. Client-owned and
     // local-download workflows remain ephemeral after processing.
@@ -132,12 +147,22 @@ Deno.serve(async (req) => {
     const extractedRows = spreadsheetInput && input.file ? spreadsheetRows(input.file) : [];
     if (spreadsheetInput && !extractedRows.length) return respond({ error: 'No transaction table with Date and Amount columns was found in the spreadsheet. No rows were sent for AI analysis.' }, 422, undefined, origin);
     if (spreadsheetInput) {
-      const chunkSize = 10, accountIds = new Set(accounts.map((account) => account.id));
+      // An Edge Function request is terminated after 150 seconds without a
+      // response.  Calling the AI serially for every ten spreadsheet rows made
+      // even ordinary bank statements exceed that limit.  Keep each model
+      // response small enough to validate, but run a deliberately bounded
+      // number of independent chunks in parallel.  The bound protects the
+      // Anthropic rate limit and avoids an unbounded burst of customer data.
+      const chunkSize = 5, parallelChunks = 3, accountIds = new Set(accounts.map((account) => account.id));
       const prepared: any[] = [], batchExceptions: string[] = [];
-      for (let offset = 0; offset < extractedRows.length; offset += chunkSize) {
-        const chunk = extractedRows.slice(offset, offset + chunkSize);
-        try {
-          const agent = await runProgressiveSkillAgent({
+      const chunks: SpreadsheetRow[][] = [];
+      for (let offset = 0; offset < extractedRows.length; offset += chunkSize) chunks.push(extractedRows.slice(offset, offset + chunkSize));
+      const analyseChunk = async (chunk: SpreadsheetRow[]) => {
+        const entries: any[] = [], exceptions: string[] = [];
+        let failure: unknown;
+        for (let attempt = 0; attempt < 2; attempt++) {
+          try {
+            const agent = await runLoadedSkillOnce({
             repository: repositoryFor('my-journal-entry-preparation'), model: Deno.env.get('MYLEKHAPAL_ANTHROPIC_MODEL') || 'claude-sonnet-4-6', apiKey: Deno.env.get('MYLEKHAPAL_ANTHROPIC_API_KEY')!, maxTokens: 5000,
             runtimeContext: `Prepare a separate reviewable DRAFT for every supplied spreadsheet row. Never silently skip a row. The source row number in each output must match exactly. Do not post, approve, delete, file a return, or claim cloud storage/export occurred. Use only source facts; put missing facts in clarifications. Business context: ${JSON.stringify(business)}. Allowed accounts (use only their IDs): ${JSON.stringify(accounts)}. ${matchingSource ? 'An identical source hash exists; flag possible duplicates.' : ''}`,
             userContent: [{ type: 'text', text: `Source method: ${input.sourceMethod}. Rows to process:\n${rowsText(chunk)}` }],
@@ -147,19 +172,42 @@ Deno.serve(async (req) => {
           const byRow = new Map(returned.map((entry: any) => [entry.source_row_number, entry]));
           for (const sourceRow of chunk) {
             const entry = byRow.get(sourceRow.row);
-            if (!entry) { batchExceptions.push(`Source row ${sourceRow.row}: model did not return a draft; pending clarification.`); continue; }
-            if (!validLines(entry.lines || [], accountIds)) { batchExceptions.push(`Source row ${sourceRow.row}: returned lines were unbalanced or used an unavailable account; pending client/CA review.`); continue; }
-            prepared.push(entry);
+            if (!entry) { exceptions.push(`Source row ${sourceRow.row}: model did not return a draft; pending clarification.`); continue; }
+            entry.lines = canonicalLines(entry.lines || [], accounts);
+            if (!validLines(entry.lines || [], accountIds)) { exceptions.push(`Source row ${sourceRow.row}: returned lines were unbalanced or used an unavailable account; pending client/CA review.`); continue; }
+            entries.push(entry);
           }
-        } catch (error) {
-          batchExceptions.push(`Rows ${chunk[0].row}-${chunk[chunk.length - 1].row}: analysis did not complete; retry this range. (${error instanceof Error ? error.message.slice(0, 80) : 'unknown error'})`);
+            failure = undefined;
+            break;
+          } catch (error) {
+            failure = error;
+            // A short retry handles transient provider throttling without
+            // allowing a failed batch to disappear from the client report.
+            if (attempt === 0) await new Promise((resolve) => setTimeout(resolve, 750));
+          }
+        }
+        if (failure) exceptions.push(`Rows ${chunk[0].row}-${chunk[chunk.length - 1].row}: analysis did not complete after retry; retry this range. (${failure instanceof Error ? failure.message.slice(0, 80) : 'unknown error'})`);
+        return { entries, exceptions };
+      };
+      for (let offset = 0; offset < chunks.length; offset += parallelChunks) {
+        const results = await Promise.all(chunks.slice(offset, offset + parallelChunks).map(analyseChunk));
+        // Promise.all preserves chunk order, so the generated workbook remains
+        // in the same source order even though analysis occurred concurrently.
+        for (const result of results) {
+          prepared.push(...result.entries);
+          batchExceptions.push(...result.exceptions);
         }
       }
       let sourceDocumentId = matchingSource?.id;
       if (!sourceDocumentId) {
         const storedFile = companyManagedStorage ? await persistManagedDocument(admin, 'business', input.businessId, input.file!, sourceHash) : null;
-        const { data: doc, error } = await admin.from('source_documents').insert({ business_id: input.businessId, doc_type: input.sourceMethod, storage_provider: storedFile ? 'supabase_storage' : 'ephemeral_processed_only', storage_path: storedFile?.path || null, file_size_bytes: storedFile?.size || null, retention_status: storedFile?.retentionStatus || 'processed_not_retained', file_name: input.file!.name, file_hash: sourceHash, extracted_fields: { rows_found: extractedRows.length, entries_prepared: prepared.length, batch_exceptions: batchExceptions }, ocr_confidence: prepared.length === extractedRows.length ? 'medium' : 'low', uploaded_by: user.id }).select('id').single();
-        if (error || !doc) throw new Error('Could not record the processed spreadsheet.');
+        // Keep the client-owned/local-download path compatible with the base
+        // schema.  The managed-storage columns were introduced later and must
+        // only be written when company storage was explicitly selected.
+        const documentRecord: Record<string, unknown> = { business_id: input.businessId, doc_type: input.sourceMethod, storage_provider: storedFile ? 'supabase_storage' : 'ephemeral_processed_only', file_name: input.file!.name, file_hash: sourceHash, extracted_fields: { rows_found: extractedRows.length, entries_prepared: prepared.length, batch_exceptions: batchExceptions }, ocr_confidence: prepared.length === extractedRows.length ? 'medium' : 'low', uploaded_by: user.id };
+        if (storedFile) Object.assign(documentRecord, { storage_path: storedFile.path, file_size_bytes: storedFile.size, retention_status: storedFile.retentionStatus });
+        const { data: doc, error } = await admin.from('source_documents').insert(documentRecord).select('id').single();
+        if (error || !doc) return respond({ error: `The spreadsheet was analysed, but its draft record could not be saved (${error?.code || 'database_error'}).` }, 500, operationId, origin);
         sourceDocumentId = doc.id;
       }
       const requestId = crypto.randomUUID(), workbookBase64 = batchWorkbook(prepared, accounts);
@@ -181,8 +229,10 @@ Deno.serve(async (req) => {
     let docId = matchingSource?.id;
     if (!docId) {
       const storedFile = input.file && companyManagedStorage ? await persistManagedDocument(admin, 'business', input.businessId, input.file, sourceHash) : null;
-      const { data: doc, error } = await admin.from('source_documents').insert({ business_id: input.businessId, doc_type: input.sourceMethod, storage_provider: storedFile ? 'supabase_storage' : 'ephemeral_processed_only', storage_path: storedFile?.path || null, file_size_bytes: storedFile?.size || null, retention_status: storedFile?.retentionStatus || 'active', file_name: input.file?.name || 'manual-entry.txt', file_hash: sourceHash, extracted_fields: draft, ocr_confidence: draft.confidence, uploaded_by: user.id }).select('id').single();
-      if (error || !doc) throw new Error('Could not record the processed source.');
+      const documentRecord: Record<string, unknown> = { business_id: input.businessId, doc_type: input.sourceMethod, storage_provider: storedFile ? 'supabase_storage' : 'ephemeral_processed_only', file_name: input.file?.name || 'manual-entry.txt', file_hash: sourceHash, extracted_fields: draft, ocr_confidence: draft.confidence, uploaded_by: user.id };
+      if (storedFile) Object.assign(documentRecord, { storage_path: storedFile.path, file_size_bytes: storedFile.size, retention_status: storedFile.retentionStatus });
+      const { data: doc, error } = await admin.from('source_documents').insert(documentRecord).select('id').single();
+      if (error || !doc) return respond({ error: `The draft was analysed, but its source record could not be saved (${error?.code || 'database_error'}).` }, 500, operationId, origin);
       docId = doc.id;
     }
     await admin.from('usage_records').insert([{ business_id: input.businessId, user_id: user.id, event_type: 'ai_document_processed', quantity: 1, estimated_cost: 0 }, { business_id: input.businessId, user_id: user.id, event_type: 'ai_tokens', quantity: agent.inputTokens + agent.outputTokens, estimated_cost: 0 }]);

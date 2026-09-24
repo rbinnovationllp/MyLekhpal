@@ -96,3 +96,41 @@ export async function runProgressiveSkillAgent(args: {
   }
   throw new Error('agent_step_limit_reached');
 }
+
+// Bulk spreadsheet imports already have a selected skill and a narrow, fixed
+// output schema.  Supplying the complete approved skill in the first request
+// avoids a separate load_skill round-trip for every small batch.  This is not a
+// reduced prompt: the entire SKILL.md is included verbatim.  It prevents a
+// large workbook from exhausting the Edge Function request window merely while
+// repeating the same skill-loading ceremony dozens of times.
+export async function runLoadedSkillOnce(args: {
+  repository: SkillRepository;
+  model: string;
+  apiKey: string;
+  userContent: unknown[];
+  runtimeContext: string;
+  finalToolName: string;
+  finalToolDescription: string;
+  finalToolSchema: Record<string, unknown>;
+  maxTokens: number;
+}): Promise<{ draft: any; requestId: string; model?: string; inputTokens: number; outputTokens: number; toolCalls: string[]; referencesLoaded: string[]; skillLoaded: boolean }> {
+  const skill = await args.repository.loadSkill();
+  const response = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', 'x-api-key': args.apiKey, 'anthropic-version': '2023-06-01' },
+    body: JSON.stringify({
+      model: args.model,
+      max_tokens: args.maxTokens,
+      system: `You are using the selected approved skill at ${args.repository.skillPath}. Follow the complete skill below verbatim. Return only the requested reviewable draft via the required tool; do not perform irreversible actions.\n\n--- BEGIN APPROVED SKILL ---\n${skill}\n--- END APPROVED SKILL ---\n\n${args.runtimeContext}`,
+      messages: [{ role: 'user', content: args.userContent }],
+      tools: [{ name: args.finalToolName, description: args.finalToolDescription, input_schema: args.finalToolSchema }],
+      tool_choice: { type: 'tool', name: args.finalToolName },
+    }),
+  });
+  const requestId = response.headers.get('request-id') || crypto.randomUUID();
+  const result = await response.json() as AnthropicResponse & { error?: unknown };
+  if (!response.ok) throw new Error(`provider_${response.status}:${requestId}`);
+  const final = (result.content || []).find((block) => block.type === 'tool_use' && block.name === args.finalToolName);
+  if (!final?.input) throw new Error('agent_did_not_return_a_tool_result');
+  return { draft: final.input, requestId, model: result.model, inputTokens: Number(result.usage?.input_tokens || 0), outputTokens: Number(result.usage?.output_tokens || 0), toolCalls: [args.finalToolName], referencesLoaded: [], skillLoaded: true };
+}
