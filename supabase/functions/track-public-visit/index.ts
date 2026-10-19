@@ -1,14 +1,14 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { publicMetricsAllowedOrigins, publicMetricsCorsHeaders } from '../_shared/public-metrics-cors.ts';
 
-const origins = new Set(['https://mylekhpal.com', 'https://www.mylekhpal.com', 'http://localhost:5173']);
-const reply = (body: unknown, status = 200, origin?: string | null) => new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json', 'cache-control': 'no-store', ...(origin && origins.has(origin) ? { 'access-control-allow-origin': origin, 'access-control-allow-headers': 'content-type, apikey, x-client-info', 'access-control-allow-methods': 'POST, OPTIONS', vary: 'origin' } : {}) } });
+const reply = (body: unknown, status = 200, origin?: string | null) => new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json', 'cache-control': 'no-store', ...publicMetricsCorsHeaders(origin ?? null) } });
 const digest = async (value: string) => Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(value)))).map((n) => n.toString(16).padStart(2, '0')).join('');
 
 Deno.serve(async (req) => {
   const origin = req.headers.get('origin');
-  if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: origin && origins.has(origin) ? { 'access-control-allow-origin': origin, 'access-control-allow-headers': 'content-type, apikey, x-client-info', 'access-control-allow-methods': 'POST, OPTIONS', vary: 'origin' } : {} });
+  if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: publicMetricsCorsHeaders(origin) });
   if (req.method !== 'POST') return reply({ error: 'Method not allowed.' }, 405, origin);
-  if (!origin || !origins.has(origin)) return reply({ error: 'Request origin rejected.' }, 403, origin);
+  if (!origin || !publicMetricsAllowedOrigins.has(origin)) return reply({ error: 'Request origin rejected.' }, 403, origin);
   try {
     const input = await req.json() as { visitorId?: string; path?: string };
     const visitorId = String(input.visitorId || '');

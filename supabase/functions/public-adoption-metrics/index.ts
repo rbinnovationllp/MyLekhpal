@@ -1,13 +1,13 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { publicMetricsAllowedOrigins, publicMetricsCorsHeaders } from '../_shared/public-metrics-cors.ts';
 
-const origins = new Set(['https://mylekhpal.com', 'https://www.mylekhpal.com', 'http://localhost:5173']);
-const response = (body: unknown, status = 200, origin?: string | null) => new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json', 'cache-control': 'public, max-age=60, s-maxage=60', ...(origin && origins.has(origin) ? { 'access-control-allow-origin': origin, vary: 'origin' } : {}) } });
+const response = (body: unknown, status = 200, origin?: string | null) => new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json', 'cache-control': 'public, max-age=60, s-maxage=60', ...publicMetricsCorsHeaders(origin ?? null) } });
 
 Deno.serve(async (req) => {
   const origin = req.headers.get('origin');
-  if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: origin && origins.has(origin) ? { 'access-control-allow-origin': origin, 'access-control-allow-methods': 'GET, OPTIONS', vary: 'origin' } : {} });
+  if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: publicMetricsCorsHeaders(origin) });
   if (!['GET', 'POST'].includes(req.method)) return response({ error: 'Method not allowed.' }, 405, origin);
-  if (origin && !origins.has(origin)) return response({ error: 'Request origin rejected.' }, 403, origin);
+  if (origin && !publicMetricsAllowedOrigins.has(origin)) return response({ error: 'Request origin rejected.' }, 403, origin);
   try {
     const url = Deno.env.get('SUPABASE_URL'), service = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
     if (!url || !service) throw new Error('missing_configuration');
