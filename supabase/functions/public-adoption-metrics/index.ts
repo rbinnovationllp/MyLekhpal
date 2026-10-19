@@ -12,7 +12,7 @@ Deno.serve(async (req) => {
     const url = Deno.env.get('SUPABASE_URL'), service = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
     if (!url || !service) throw new Error('missing_configuration');
     const admin = createClient(url, service);
-    const { data, error } = await admin.schema('private').rpc('public_adoption_metrics');
+    const { data, error } = await admin.rpc('get_public_adoption_metrics');
     if (error || !data?.[0]) throw new Error('metrics_unavailable');
     const metrics = data[0];
     return response({ totalVisitors: Number(metrics.total_visitors), uniqueVisitors: Number(metrics.unique_visitors), registeredUsers: Number(metrics.registered_users), activeAdopters: Number(metrics.active_adopters) }, 200, origin);
