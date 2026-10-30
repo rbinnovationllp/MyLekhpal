@@ -10,6 +10,15 @@
   <body>
     <div id="root"></div>
     <noscript>Please enable JavaScript to use Mylekhpal.</noscript>
+    <script type="module">
+      if (import.meta.env.DEV) {
+        const RefreshRuntime = await import('/@react-refresh');
+        RefreshRuntime.default.injectIntoGlobalHook(window);
+        window.$RefreshReg$ = () => {};
+        window.$RefreshSig$ = () => (type) => type;
+        window.__vite_plugin_react_preamble_installed__ = true;
+      }
+    </script>
     <script type="module" src="/hostinger/main.tsx"></script>
   </body>
 </html>

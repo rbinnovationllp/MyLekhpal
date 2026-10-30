@@ -1,5 +1,4 @@
 import { defineConfig, loadEnv } from 'vite';
-import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/postcss';
 import { fileURLToPath } from 'node:url';
 
@@ -13,7 +12,10 @@ export default defineConfig(({ mode }) => {
     throw new Error('The browser Supabase key must have the anon role.');
   }
   return {
-    plugins: [react()],
+    // Vite's native JSX transform is sufficient for this static React entry.
+    // Avoid the React plugin's refresh transform: its dev preamble is not
+    // injected into the Hostinger HTML entry and previously crashed the page.
+    plugins: [],
     resolve: { alias: { '@': fileURLToPath(new URL('.', import.meta.url)) } },
     css: { postcss: { plugins: [tailwindcss()] } },
     define: {

@@ -1,0 +1,7 @@
+
+> sites-project@0.1.0 start
+> vite preview --config vite.hostinger.config.ts
+
+  ➜  Local:   http://localhost:4173/
+  ➜  Network: use --host to expose
+  ➜  press h + enter to show help

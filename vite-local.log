@@ -1,0 +1,37 @@
+
+> sites-project@0.1.0 dev
+> vite --config vite.hostinger.config.ts
+
+Port 5173 is in use, trying another one...
+Port 5174 is in use, trying another one...
+
+  VITE v8.2.2  ready in 2076 ms
+
+  ➜  Local:   http://localhost:5175/
+  ➜  Network: use --host to expose
+  ➜  press h + enter to show help
+09:24:48 [vite] (client) [Unhandled error] ReferenceError: $RefreshSig$ is not defined
+ > components/public-adoption-counter.tsx:5:10
+    4  |  import { supabase } from '../hostinger/supabase';
+    5  |  
+    6  |  type Metrics = { totalVisitors: number; uniqueVisitors: number; registeredUsers: number; activeAdopters: number };
+       |           ^
+    7  |  const format = (value: number) => new Intl.NumberFormat('en-IN').format(value);
+    8  |  
+
+09:26:30 [vite] (client) hmr update /app/globals.css
+09:34:20 [vite] vite.hostinger.config.ts changed, restarting server...
+09:34:21 [vite] vite.hostinger.config.ts changed, restarting server...
+09:34:23 [vite] (client) Re-optimizing dependencies because vite config has changed
+09:34:24 [vite] server restarted.
+09:34:25 [vite] (client) [optimizer] scanning dependencies...
+09:34:28 [vite] (client) [optimizer] bundling dependencies...
+09:34:44 [vite] (client) [Unhandled error] ReferenceError: $RefreshSig$ is not defined
+ > components/public-adoption-counter.tsx:5:10
+    4  |  import { supabase } from '../hostinger/supabase';
+    5  |  
+    6  |  type Metrics = { totalVisitors: number; uniqueVisitors: number; registeredUsers: number; activeAdopters: number };
+       |           ^
+    7  |  const format = (value: number) => new Intl.NumberFormat('en-IN').format(value);
+    8  |  
+

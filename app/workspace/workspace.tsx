@@ -47,6 +47,8 @@ const money = (n: number) =>
     n / 100,
   );
 const blankLine = () => ({ account: '', debit: '', credit: '' });
+const entityTypes = ['Proprietorship', 'Partnership firm', 'Limited Liability Partnership (LLP)', 'Private limited company', 'Public limited company', 'One Person Company', 'Hindu Undivided Family (HUF)', 'Trust / Society', 'Other'];
+const indianStates = ['Andaman and Nicobar Islands', 'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chandigarh', 'Chhattisgarh', 'Dadra and Nagar Haveli and Daman and Diu', 'Delhi', 'Goa', 'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jammu and Kashmir', 'Jharkhand', 'Karnataka', 'Kerala', 'Ladakh', 'Lakshadweep', 'Madhya Pradesh', 'Maharashtra', 'Manipur', 'Meghalaya', 'Mizoram', 'Nagaland', 'Odisha', 'Puducherry', 'Punjab', 'Rajasthan', 'Sikkim', 'Tamil Nadu', 'Telangana', 'Tripura', 'Uttar Pradesh', 'Uttarakhand', 'West Bengal'];
 type ImportResult = {
   name: string;
   kind: 'spreadsheet' | 'image' | 'document';
@@ -464,7 +466,7 @@ export default function Workspace({ user }: { user: string }) {
       <header className="workspace-header">
         <a href="/" className="brand">
           <BookOpenCheck />
-          mylekhpal.
+          MyLekhapal.
         </a>
         <div>
           <button className="quiet" onClick={() => setHi(!hi)}>
@@ -584,17 +586,15 @@ export default function Workspace({ user }: { user: string }) {
                   </label>
                   <label>
                     {t('Entity type', 'इकाई का प्रकार')}
-                    <input
-                      name="entityType"
-                      maxLength={80}
-                      placeholder={t('e.g. Proprietorship', 'उदा. एकल स्वामित्व')}
-                    />
+                    <select name="entityType" defaultValue=""><option value="">{t('Select entity type', 'इकाई का प्रकार चुनें')}</option>{entityTypes.map((value) => <option key={value} value={value}>{value}</option>)}</select>
                   </label>
                   <label>
                     PAN
                   <input
                     name="pan"
                     maxLength={10}
+                    pattern="[A-Za-z]{5}[0-9]{4}[A-Za-z]"
+                    title="Use the PAN format ABCDE1234F. This checks format only."
                     placeholder="Optional during setup"
                   />
                 </label>
@@ -603,6 +603,8 @@ export default function Workspace({ user }: { user: string }) {
                   <input
                     name="gstin"
                     maxLength={15}
+                    pattern="[0-9]{2}[A-Za-z]{5}[0-9]{4}[A-Za-z][1-9A-Za-z]Z[0-9A-Za-z]"
+                    title="Use the 15-character GSTIN format. This checks format only."
                     placeholder="Optional during setup"
                   />
                 </label>
@@ -623,7 +625,7 @@ export default function Workspace({ user }: { user: string }) {
                 </label>
                 <label>
                   {t('State', 'राज्य')}
-                  <input name="state" maxLength={80} />
+                  <select name="state" defaultValue=""><option value="">{t('Select state or Union Territory', 'राज्य या केंद्र शासित प्रदेश चुनें')}</option>{indianStates.map((value) => <option key={value} value={value}>{value}</option>)}</select>
                 </label>
                 <label className="full">
                   {t('Business address', 'व्यवसाय पता')}
@@ -643,7 +645,7 @@ export default function Workspace({ user }: { user: string }) {
                   'मैं इस व्यवसाय के लिए ये प्रारंभिक खाते बनाने की अनुमति देता हूँ।',
                 )}
               </label>
-              <button className="button" disabled={busy || !confirm}>
+              <button type="submit" className="button" disabled={busy || !confirm}>
                 {busy
                   ? t('Saving…', 'सहेज रहे हैं…')
                   : t('Save setup draft', 'सेटअप ड्राफ्ट सहेजें')}

@@ -37,6 +37,7 @@ export default function Home() {
         <a className="button small" href="/workspace">
           Get started <ArrowUpRight size={17} />
         </a>
+        <details className="mobile-menu"><summary aria-label="Open navigation menu">Menu</summary><div><a href="#workflow">How it works</a><a href="#together">For businesses & CAs</a><a href="/personal">Personal Finance</a><a href="/workspace">Workspace</a></div></details>
       </nav>
       <section className="hero wrap">
         <div className="hero-copy">
@@ -252,7 +253,7 @@ export default function Home() {
       <section className="section wrap compliance-notice" id="compliance">
         <span className="eyebrow">COMPLIANCE &amp; PROFESSIONAL USE</span>
         <h2>Important information for clients</h2>
-        <p><b>MyLekhapal is an accounting-software platform developed by Rashi Bhartiya Innovation LLP.</b> It is not presented as government-approved, GSTN-certified, or as a replacement for a Chartered Accountant, statutory auditor, tax practitioner, or other authorised professional.</p>
+        <p><b>MyLekhpal is an accounting-software platform developed by Rashi Bhartiya Innovation LLP.</b> It is not presented as government-approved, GSTN-certified, or as a replacement for a Chartered Accountant, statutory auditor, tax practitioner, or other authorised professional.</p>
         <p>The service prepares accounting drafts for verification. Accounting, GST treatment, audit-trail review, and any filing remain subject to client and qualified-professional approval.</p>
         <div className="compliance-grid">
           <article><b>Journals, ledgers and reports</b><span>The platform supports preparation and review of accounting records; it does not claim a special government software licence.</span></article>
@@ -281,6 +282,7 @@ export default function Home() {
         <small>
           Foundation preview. AI and tax workings require professional review.
         </small>
+        <div className="footer-links"><a href="/privacy">Privacy Policy draft</a><a href="/terms">Terms of Service draft</a><a href="/personal">Personal Finance plans</a></div>
       </footer>
     </main>
   );

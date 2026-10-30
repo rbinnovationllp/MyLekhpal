@@ -67,7 +67,7 @@ export default function Account() {
   const title = mode === 'signup' ? `Create your ${roleLabel || 'Mylekhpal'} account` : mode === 'reset' ? 'Reset your password' : mode === 'update' ? 'Choose a new password' : roleLabel ? `Sign in as ${roleLabel}` : 'Sign in to Mylekhpal';
   return <main className="login-shell">
     <section className="login-panel">
-      <a href="/" className="brand">mylekhpal<span className="brand-dot">.</span></a>
+      <a href="/" className="brand">MyLekhapal<span className="brand-dot">.</span></a>
       <h1>{title}</h1>
       <form onSubmit={submit}>
       {mode !== 'update' && <label>Email address<input name="email" type="email" autoComplete="email" required style={{ width: '100%' }} /></label>}

@@ -380,7 +380,7 @@ export default function Workspace({ user }: { user: string }) {
       <header className="workspace-header">
         <a href="/" className="brand">
           <BookOpenCheck />
-          mylekhpal.
+          MyLekhapal.
         </a>
         <div>
           <button className="quiet" onClick={() => setHi(!hi)}>

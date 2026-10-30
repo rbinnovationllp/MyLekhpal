@@ -2,8 +2,9 @@ DirectoryIndex index.html
 Options -Indexes
 <IfModule mod_rewrite.c>
 RewriteEngine On
-RewriteRule ^workspace/?$ index.html [L]
-RewriteRule ^personal/?$ index.html [L]
+# Client-side routes that have a real view in hostinger/main.tsx. Keep all
+# other paths as genuine 404s rather than masking broken links with the home page.
+RewriteRule ^(workspace|personal|pricing|about|privacy|terms|login)/?$ index.html [L]
 </IfModule>
 <IfModule mod_headers.c>
 Header always set X-Content-Type-Options "nosniff"
