@@ -12,5 +12,5 @@ createRoot(document.getElementById('root')!).render(
   path === '/privacy' ? <LegalPage kind="privacy" /> : path === '/terms' ? <LegalPage kind="terms" /> :
   path === '/pricing' ? <PersonalMarketing /> : path === '/about' ? <Home /> : path === '/login' || path === '/workspace' ?
     <Suspense fallback={<main className="wrap"><p role="status">Loading your workspace…</p></main>}><Account /></Suspense> :
-    <main className="wrap"><h1>Page not found</h1><a href="/">Return to Mylekhpal</a></main>,
+    <main className="wrap"><h1>Page not found</h1><a href="/">Return to MyLekhpal</a></main>,
 );

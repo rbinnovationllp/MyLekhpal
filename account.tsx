@@ -64,10 +64,10 @@ export default function Account() {
     <Workspace key={session.user.id} user={session.user.email || 'Your account'} />
   </>;
   const roleLabel = requestedRole === 'owner' ? 'Business Owner' : requestedRole === 'ca_partner' ? 'Chartered Accountant' : requestedRole === 'accountant' ? 'Accountant / Bookkeeper' : '';
-  const title = mode === 'signup' ? `Create your ${roleLabel || 'Mylekhpal'} account` : mode === 'reset' ? 'Reset your password' : mode === 'update' ? 'Choose a new password' : roleLabel ? `Sign in as ${roleLabel}` : 'Sign in to Mylekhpal';
+  const title = mode === 'signup' ? `Create your ${roleLabel || 'MyLekhpal'} account` : mode === 'reset' ? 'Reset your password' : mode === 'update' ? 'Choose a new password' : roleLabel ? `Sign in as ${roleLabel}` : 'Sign in to MyLekhpal';
   return <main className="login-shell">
     <section className="login-panel">
-      <a href="/" className="brand">MyLekhapal<span className="brand-dot">.</span></a>
+      <a href="/" className="brand">MyLekhpal<span className="brand-dot">.</span></a>
       <h1>{title}</h1>
       <form onSubmit={submit}>
       {mode !== 'update' && <label>Email address<input name="email" type="email" autoComplete="email" required style={{ width: '100%' }} /></label>}
@@ -80,9 +80,9 @@ export default function Account() {
       {(['signin', 'signup', 'reset'] as const).filter(item => item !== mode).map(item => <button key={item} className="button small" onClick={() => { setMode(item); setError(''); setNotice(''); }}>{item === 'signin' ? 'Sign in' : item === 'signup' ? 'Create account' : 'Forgot password?'}</button>)}
       </div>}
     </section>
-    <aside className="login-cultural-brand" aria-label="MyLekhapal cultural brand identity">
-      <img src="/chitragupta-mylekhpal.png" loading="lazy" decoding="async" width="1254" height="1254" alt="Lord Chitragupta, respectfully presented as MyLekhapal’s cultural brand identity" />
-      <p>MyLekhapal cultural brand identity. This image does not imply government, religious-institutional or professional endorsement.</p>
+    <aside className="login-cultural-brand" aria-label="MyLekhpal cultural brand identity">
+      <img src="/chitragupta-mylekhpal.png" loading="lazy" decoding="async" width="1254" height="1254" alt="Lord Chitragupta, respectfully presented as MyLekhpal’s cultural brand identity" />
+      <p>MyLekhpal cultural brand identity. This image does not imply government, religious-institutional or professional endorsement.</p>
     </aside>
   </main>;
 }

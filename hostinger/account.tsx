@@ -66,9 +66,9 @@ export default function Account() {
     {selectedService === 'personal' ? <PersonalWorkspace key={session.user.id} /> : <Workspace key={session.user.id} user={session.user.email || 'Your account'} />}
   </>;
   const roleLabel = requestedRole === 'owner' ? 'Business Owner' : requestedRole === 'ca_partner' ? 'Chartered Accountant' : requestedRole === 'accountant' ? 'Accountant / Bookkeeper' : '';
-  const title = mode === 'signup' ? `Create your ${roleLabel || 'Mylekhpal'} account` : mode === 'reset' ? 'Reset your password' : mode === 'update' ? 'Choose a new password' : roleLabel ? `Sign in as ${roleLabel}` : 'Sign in to Mylekhpal';
+  const title = mode === 'signup' ? `Create your ${roleLabel || 'MyLekhpal'} account` : mode === 'reset' ? 'Reset your password' : mode === 'update' ? 'Choose a new password' : roleLabel ? `Sign in as ${roleLabel}` : 'Sign in to MyLekhpal';
   return <main className="wrap" style={{ maxWidth: 520, paddingTop: 60, paddingBottom: 60 }}>
-    <a href="/" className="brand">MyLekhapal<span className="brand-dot">.</span></a>
+    <a href="/" className="brand">MyLekhpal<span className="brand-dot">.</span></a>
     <h1 style={{ fontSize: '2rem', marginTop: 32 }}>{title}</h1>
     <form onSubmit={submit} style={{ display: 'grid', gap: 18, marginTop: 24 }}>
       {mode !== 'update' && <label>Email address<input name="email" type="email" autoComplete="email" required style={{ width: '100%' }} /></label>}

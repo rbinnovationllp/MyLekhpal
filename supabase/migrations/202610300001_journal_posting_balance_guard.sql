@@ -65,13 +65,13 @@ revoke all on function public.assert_posted_journal_is_balanced() from public, a
 
 drop trigger if exists journal_lines_require_posted_balance on public.journal_lines;
 create constraint trigger journal_lines_require_posted_balance
-after insert or update of entry_id, debit, credit or delete on public.journal_lines
+after insert or update or delete on public.journal_lines
 deferrable initially deferred
 for each row execute function public.assert_posted_journal_is_balanced();
 
 drop trigger if exists journal_posting_requires_balance on public.journal_entries;
 create constraint trigger journal_posting_requires_balance
-after update of status on public.journal_entries
+after insert or update on public.journal_entries
 deferrable initially deferred
 for each row execute function public.assert_posted_journal_is_balanced();
 

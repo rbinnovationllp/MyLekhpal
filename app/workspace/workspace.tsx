@@ -140,7 +140,7 @@ export default function Workspace({ user }: { user: string }) {
   useEffect(() => {
     const callback = new URLSearchParams(window.location.search).get('google_drive');
     if (!callback) return;
-    if (callback === 'connected') setNotice('Google Drive was connected successfully. MyLekhapal can now use the authorised Drive workspace.');
+    if (callback === 'connected') setNotice('Google Drive was connected successfully. MyLekhpal can now use the authorised Drive workspace.');
     else setError('Google Drive connection was not completed. You can try again after checking the Google account and consent settings.');
     const cleanUrl = new URL(window.location.href);
     cleanUrl.searchParams.delete('google_drive');
@@ -393,7 +393,7 @@ export default function Workspace({ user }: { user: string }) {
       setLines(draft.lines.map((line: any) => ({ account: line.account_id, debit: line.debit ? String(line.debit) : '', credit: line.credit ? String(line.credit) : '' })));
       setAiDraft({ ...draft, model: result.model, requestId: result.requestId, skill: result.skill });
       setImported((current) => current ? { ...current, date: draft.transaction_date || '', reference: draft.reference || '', party: draft.party_name || '', description: draft.narration || current.description, taxableAmount: draft.taxable_amount == null ? '' : String(draft.taxable_amount), gst: draft.gst_amount == null ? '' : String(draft.gst_amount), total: draft.total_amount == null ? '' : String(draft.total_amount), missing: (draft.completeness || []).filter((item: any) => ['missing', 'invalid', 'inconsistent', 'pending_professional_review'].includes(item.status)).map((item: any) => item.field) } : current);
-      setNotice(t(`MyLekhapal Intelligence prepared a ${draft.status} draft. Review required before saving.`, `MyLekhapal Intelligence ने ${draft.status} ड्राफ्ट तैयार किया। सहेजने से पहले समीक्षा आवश्यक है।`));
+      setNotice(t(`MyLekhpal Intelligence prepared a ${draft.status} draft. Review required before saving.`, `MyLekhpal Intelligence ने ${draft.status} ड्राफ्ट तैयार किया। सहेजने से पहले समीक्षा आवश्यक है।`));
     } catch (reason: any) {
       const message = reason?.message || t('We could not prepare a journal draft. Please try again.', 'जर्नल ड्राफ्ट तैयार नहीं हो सका। कृपया पुनः प्रयास करें।');
       setAnalysisError(message);
@@ -466,7 +466,7 @@ export default function Workspace({ user }: { user: string }) {
       <header className="workspace-header">
         <a href="/" className="brand">
           <BookOpenCheck />
-          MyLekhapal.
+          MyLekhpal.
         </a>
         <div>
           <button className="quiet" onClick={() => setHi(!hi)}>
@@ -479,8 +479,8 @@ export default function Workspace({ user }: { user: string }) {
         <div className="notice">
           <ShieldCheck size={18} />
           {t(
-            'MyLekhapal Intelligence prepares reviewable journal drafts from supported documents. It never posts entries automatically; use test records until professional review is configured.',
-            'MyLekhapal Intelligence समर्थित दस्तावेज़ों से समीक्षा योग्य जर्नल ड्राफ्ट तैयार करता है। यह कभी अपने-आप प्रविष्टियाँ पोस्ट नहीं करता; पेशेवर समीक्षा सेट होने तक परीक्षण रिकॉर्ड उपयोग करें।',
+            'MyLekhpal Intelligence prepares reviewable journal drafts from supported documents. It never posts entries automatically; use test records until professional review is configured.',
+            'MyLekhpal Intelligence समर्थित दस्तावेज़ों से समीक्षा योग्य जर्नल ड्राफ्ट तैयार करता है। यह कभी अपने-आप प्रविष्टियाँ पोस्ट नहीं करता; पेशेवर समीक्षा सेट होने तक परीक्षण रिकॉर्ड उपयोग करें।',
           )}
         </div>
         {error && (
@@ -519,19 +519,19 @@ export default function Workspace({ user }: { user: string }) {
             <div className="section-heading">
               <div><span className="eyebrow">GOOGLE SHEETS JOURNAL DELIVERY</span><h2>Choose where this business keeps its journal</h2></div>
             </div>
-            <p className="muted">Choose one secure destination per business. Entries are appended using the saved business mapping; MyLekhapal never searches Drive by client name.</p>
+            <p className="muted">Choose one secure destination per business. Entries are appended using the saved business mapping; MyLekhpal never searches Drive by client name.</p>
             <div className="form-grid">
               <label>Journal location
                 <select value={googleTargetMode} onChange={(event) => setGoogleTargetMode(event.target.value as 'client_owned' | 'company_owned')}>
                   <option value="client_owned">Client-owned Google Sheet</option>
-                  <option value="company_owned">Company-managed MyLekhapal Drive folder</option>
+                  <option value="company_owned">Company-managed MyLekhpal Drive folder</option>
                 </select>
               </label>
               {googleTargetMode === 'client_owned' && <label>Existing spreadsheet URL or ID (optional)
                 <input value={googleSpreadsheet} onChange={(event) => setGoogleSpreadsheet(event.target.value)} placeholder="https://docs.google.com/spreadsheets/d/..." />
               </label>}
             </div>
-            <label className="check-row"><input type="checkbox" checked={googleConsent} onChange={(event) => setGoogleConsent(event.target.checked)} /> I consent to MyLekhapal saving this business’s journal entries in the selected Google Sheets location. I can change or revoke this connection later.</label>
+            <label className="check-row"><input type="checkbox" checked={googleConsent} onChange={(event) => setGoogleConsent(event.target.checked)} /> I consent to MyLekhpal saving this business’s journal entries in the selected Google Sheets location. I can change or revoke this connection later.</label>
             <button className="button small" disabled={googleBusy || !googleConsent} onClick={saveGoogleDelivery}>{googleBusy ? 'Saving Google delivery…' : 'Save Google Sheets delivery'}</button>
           </section>
         )}
@@ -828,8 +828,8 @@ export default function Workspace({ user }: { user: string }) {
                   </p>
                   <p className="professional-boundary">
                     {t(
-                      'MyLekhapal provides bookkeeping and compliance-preparation assistance. AI-generated entries and tax estimates must be reviewed by an authorized accountant or Chartered Accountant before posting, payment or return filing.',
-                      'MyLekhapal बहीखाता और अनुपालन-तैयारी सहायता प्रदान करता है। AI-निर्मित प्रविष्टियों और कर अनुमानों की पोस्टिंग, भुगतान या रिटर्न फाइलिंग से पहले अधिकृत लेखाकार या चार्टर्ड अकाउंटेंट द्वारा समीक्षा की जानी चाहिए।',
+                      'MyLekhpal provides bookkeeping and compliance-preparation assistance. AI-generated entries and tax estimates must be reviewed by an authorized accountant or Chartered Accountant before posting, payment or return filing.',
+                      'MyLekhpal बहीखाता और अनुपालन-तैयारी सहायता प्रदान करता है। AI-निर्मित प्रविष्टियों और कर अनुमानों की पोस्टिंग, भुगतान या रिटर्न फाइलिंग से पहले अधिकृत लेखाकार या चार्टर्ड अकाउंटेंट द्वारा समीक्षा की जानी चाहिए।',
                     )}
                   </p>
                 </section>
@@ -924,7 +924,7 @@ export default function Workspace({ user }: { user: string }) {
                       <div>
                         <span className="eyebrow">{t('DOCUMENT ASSIST', 'दस्तावेज़ सहायता')}</span>
                         <h3 id="document-import-title">{t('Start from a document or photo', 'दस्तावेज़ या फ़ोटो से शुरू करें')}</h3>
-                        <p>{t('This submission is processed by MyLekhapal Intelligence. Add a CSV, Excel file, PDF, invoice, receipt or handwritten chit; it prepares a reviewable draft and never posts automatically.', 'यह सबमिशन MyLekhapal Intelligence द्वारा प्रोसेस किया जाता है। यह समीक्षा योग्य ड्राफ्ट तैयार करता है और कभी अपने-आप पोस्ट नहीं करता।')}</p>
+                        <p>{t('This submission is processed by MyLekhpal Intelligence. Add a CSV, Excel file, PDF, invoice, receipt or handwritten chit; it prepares a reviewable draft and never posts automatically.', 'यह सबमिशन MyLekhpal Intelligence द्वारा प्रोसेस किया जाता है। यह समीक्षा योग्य ड्राफ्ट तैयार करता है और कभी अपने-आप पोस्ट नहीं करता।')}</p>
                       </div>
                     </div>
                     <div className="import-actions">
@@ -947,7 +947,7 @@ export default function Workspace({ user }: { user: string }) {
                       </div>
                       <div className="extraction-status">
                         {imported.kind === 'spreadsheet' ? <CheckCircle2 size={18} /> : <AlertTriangle size={18} />}
-                        <div><b>{aiBusy ? t('Preparing your journal draft', 'आपका जर्नल ड्राफ्ट तैयार हो रहा है') : analysisError ? t('Analysis could not be completed', 'विश्लेषण पूरा नहीं हो सका') : aiDraft ? t('Review required', 'समीक्षा आवश्यक') : t('Document selected', 'दस्तावेज़ चुना गया')}</b><span>{aiBusy ? t('MyLekhapal Intelligence is checking details, GST treatment, accounts and debits/credits.', 'MyLekhapal Intelligence विवरण, GST, खाते और डेबिट/क्रेडिट की जाँच कर रहा है।') : analysisError ? analysisError : aiDraft ? t('Details below are a draft only. Correct anything uncertain before you save.', 'नीचे के विवरण केवल ड्राफ्ट हैं। सहेजने से पहले अनिश्चित जानकारी सुधारें।') : t('The file is ready. Analysis will begin automatically.', 'फ़ाइल तैयार है। विश्लेषण अपने-आप शुरू होगा।')}</span></div>
+                        <div><b>{aiBusy ? t('Preparing your journal draft', 'आपका जर्नल ड्राफ्ट तैयार हो रहा है') : analysisError ? t('Analysis could not be completed', 'विश्लेषण पूरा नहीं हो सका') : aiDraft ? t('Review required', 'समीक्षा आवश्यक') : t('Document selected', 'दस्तावेज़ चुना गया')}</b><span>{aiBusy ? t('MyLekhpal Intelligence is checking details, GST treatment, accounts and debits/credits.', 'MyLekhpal Intelligence विवरण, GST, खाते और डेबिट/क्रेडिट की जाँच कर रहा है।') : analysisError ? analysisError : aiDraft ? t('Details below are a draft only. Correct anything uncertain before you save.', 'नीचे के विवरण केवल ड्राफ्ट हैं। सहेजने से पहले अनिश्चित जानकारी सुधारें।') : t('The file is ready. Analysis will begin automatically.', 'फ़ाइल तैयार है। विश्लेषण अपने-आप शुरू होगा。')}</span></div>
                       </div>
                       <div className="extracted-grid">
                         <span><small>{t('Date', 'तारीख')}</small><b>{imported.date || '—'}</b></span>
@@ -967,7 +967,7 @@ export default function Workspace({ user }: { user: string }) {
                         {aiBatch.exceptions?.length > 0 && <p className="missing"><AlertTriangle size={16} /> {aiBatch.exceptions.join(' ')}</p>}
                         <div className="batch-table-wrap"><table><thead><tr><th>Source row</th><th>Date</th><th>Party</th><th>Draft status</th><th>Confidence</th></tr></thead><tbody>{(aiBatch.entries || []).map((entry: any, index: number) => <tr key={`${entry.source_row_number}-${index}`}><td>{entry.source_row_number}</td><td>{entry.transaction_date || '—'}</td><td>{entry.party_name || '—'}</td><td>{entry.status}</td><td>{entry.confidence}</td></tr>)}</tbody></table></div>
                       </section>}
-                      {aiBusy && <p role="status" className="helper">{t('MyLekhapal Intelligence is preparing a draft…', 'MyLekhapal Intelligence ड्राफ्ट तैयार कर रहा है…')}</p>}
+                      {aiBusy && <p role="status" className="helper">{t('MyLekhpal Intelligence is preparing a draft…', 'MyLekhpal Intelligence ड्राफ्ट तैयार कर रहा है…')}</p>}
                     </div>}
                   </div>
                   <form onSubmit={saveEntry}>

@@ -1,0 +1,12 @@
+diff --git a/supabase/functions/google-drive-callback/index.ts b/supabase/functions/google-drive-callback/index.ts
+--- a/supabase/functions/google-drive-callback/index.ts
++++ b/supabase/functions/google-drive-callback/index.ts
+@@
+-    // Atomic delete-and-return makes a state single-use before any provider call.
+-    // A failed callback must start a fresh OAuth flow instead of retrying a state.
+-    const { data: states, error: stateError } = await admin.rpc('google_oauth_consume_state', { p_state_hash: stateHash });
++    const { data: states, error: stateError } = await admin.rpc('google_oauth_lookup_state', { p_state_hash: stateHash });
+@@
+-    await diagnostic(admin, { requestId, stage: 'connection_saved', outcome: 'succeeded', serviceArea, workspaceId, userId: stateRow.user_id });
++    await admin.rpc('google_oauth_delete_state', { p_state_hash: stateHash });
++    await diagnostic(admin, { requestId, stage: 'connection_saved', outcome: 'succeeded', serviceArea, workspaceId, userId: stateRow.user_id });

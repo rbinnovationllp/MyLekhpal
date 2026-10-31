@@ -12,7 +12,9 @@ Deno.serve(async (req) => {
     if (providerError || !code || !state) throw new Error(providerError ? `provider_${providerError}` : 'missing_callback_parameters');
     admin = adminClient();
     const stateHash = await sha256(state);
-    const { data: states, error: stateError } = await admin.rpc('google_oauth_lookup_state', { p_state_hash: stateHash });
+    // Atomic delete-and-return makes a state single-use before any provider call.
+    // A failed callback must start a fresh OAuth flow instead of retrying a state.
+    const { data: states, error: stateError } = await admin.rpc('google_oauth_consume_state', { p_state_hash: stateHash });
     const stateRow = states?.[0];
     if (stateError || !stateRow || new Date(stateRow.expires_at).valueOf() < Date.now()) throw new Error('invalid_or_expired_state');
     const serviceArea = stateRow.service_area as ServiceArea, workspaceId = (stateRow.business_id || stateRow.household_id) as string;
@@ -39,7 +41,6 @@ Deno.serve(async (req) => {
       const { error: secretError } = await admin.rpc('google_oauth_store_secret', { p_connection_id: secret.connection_id, p_refresh: secret.refresh_token_ciphertext, p_access: secret.access_token_ciphertext, p_expires_at: secret.access_token_expires_at });
       if (secretError) throw new Error('token_secret_save_failed');
     }
-    await admin.rpc('google_oauth_delete_state', { p_state_hash: stateHash });
     await diagnostic(admin, { requestId, stage: 'connection_saved', outcome: 'succeeded', serviceArea, workspaceId, userId: stateRow.user_id });
     return redirect('connected', serviceArea);
   } catch (error) {

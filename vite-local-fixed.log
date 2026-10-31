@@ -809,3 +809,422 @@ Port 5174 is in use, trying another one...
       at async EnvironmentPluginContainer.transform (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:30932:14)
       at async loadAndTransform (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:20671:26)
       at async viteTransformMiddleware (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:25205:20)
+13:10:46 [vite] (client) page reload app/page.tsx
+13:10:48 [vite] (client) Pre-transform error: Failed to resolve import "/@react-refresh" from "index.html?html-proxy&index=0.js". Does the file exist?
+  Plugin: vite:import-analysis
+  File: C:/Users/HP/install-this-skill/outputs/mylekhpal/index.html?html-proxy&index=0.js:15:44
+  1  |  
+  2  |        if (import.meta.env.DEV) {
+  3  |          const RefreshRuntime = await import('/@react-refresh');
+     |                                              ^
+  4  |          RefreshRuntime.default.injectIntoGlobalHook(window);
+  5  |          window.$RefreshReg$ = () => {};
+13:10:48 [vite] Internal server error: Failed to resolve import "/@react-refresh" from "index.html?html-proxy&index=0.js". Does the file exist?
+  Plugin: vite:import-analysis
+  File: C:/Users/HP/install-this-skill/outputs/mylekhpal/index.html?html-proxy&index=0.js:15:44
+  1  |  
+  2  |        if (import.meta.env.DEV) {
+  3  |          const RefreshRuntime = await import('/@react-refresh');
+     |                                              ^
+  4  |          RefreshRuntime.default.injectIntoGlobalHook(window);
+  5  |          window.$RefreshReg$ = () => {};
+      at TransformPluginContext._formatLog (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:31147:39)
+      at TransformPluginContext.error (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:31144:14)
+      at normalizeUrl (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:28083:18)
+      at async file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:28153:30
+      at async Promise.all (index 1)
+      at async TransformPluginContext.transform (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:28119:4)
+      at async EnvironmentPluginContainer.transform (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:30932:14)
+      at async loadAndTransform (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:20671:26)
+      at async viteTransformMiddleware (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:25205:20)
+13:10:55 [vite] (client) hmr update /app/globals.css
+13:10:55 [vite] (client) Pre-transform error: Failed to resolve import "/@react-refresh" from "index.html?html-proxy&index=0.js". Does the file exist?
+  Plugin: vite:import-analysis
+  File: C:/Users/HP/install-this-skill/outputs/mylekhpal/index.html?html-proxy&index=0.js:15:44
+  1  |  
+  2  |        if (import.meta.env.DEV) {
+  3  |          const RefreshRuntime = await import('/@react-refresh');
+     |                                              ^
+  4  |          RefreshRuntime.default.injectIntoGlobalHook(window);
+  5  |          window.$RefreshReg$ = () => {};
+13:10:57 [vite] Internal server error: Failed to resolve import "/@react-refresh" from "index.html?html-proxy&index=0.js". Does the file exist?
+  Plugin: vite:import-analysis
+  File: C:/Users/HP/install-this-skill/outputs/mylekhpal/index.html?html-proxy&index=0.js:15:44
+  1  |  
+  2  |        if (import.meta.env.DEV) {
+  3  |          const RefreshRuntime = await import('/@react-refresh');
+     |                                              ^
+  4  |          RefreshRuntime.default.injectIntoGlobalHook(window);
+  5  |          window.$RefreshReg$ = () => {};
+      at TransformPluginContext._formatLog (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:31147:39)
+      at TransformPluginContext.error (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:31144:14)
+      at normalizeUrl (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:28083:18)
+      at async file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:28153:30
+      at async Promise.all (index 1)
+      at async TransformPluginContext.transform (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:28119:4)
+      at async EnvironmentPluginContainer.transform (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:30932:14)
+      at async loadAndTransform (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:20671:26)
+      at async viteTransformMiddleware (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:25205:20)
+13:13:27 [vite] (client) page reload index.html
+13:13:27 [vite] (client) page reload index.html
+13:13:29 [vite] (client) Pre-transform error: Failed to resolve import "/@react-refresh" from "index.html?html-proxy&index=0.js". Does the file exist?
+  Plugin: vite:import-analysis
+  File: C:/Users/HP/install-this-skill/outputs/mylekhpal/index.html?html-proxy&index=0.js:15:44
+  1  |  
+  2  |        if (import.meta.env.DEV) {
+  3  |          const RefreshRuntime = await import('/@react-refresh');
+     |                                              ^
+  4  |          RefreshRuntime.default.injectIntoGlobalHook(window);
+  5  |          window.$RefreshReg$ = () => {};
+13:13:29 [vite] Internal server error: Failed to resolve import "/@react-refresh" from "index.html?html-proxy&index=0.js". Does the file exist?
+  Plugin: vite:import-analysis
+  File: C:/Users/HP/install-this-skill/outputs/mylekhpal/index.html?html-proxy&index=0.js:15:44
+  1  |  
+  2  |        if (import.meta.env.DEV) {
+  3  |          const RefreshRuntime = await import('/@react-refresh');
+     |                                              ^
+  4  |          RefreshRuntime.default.injectIntoGlobalHook(window);
+  5  |          window.$RefreshReg$ = () => {};
+      at TransformPluginContext._formatLog (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:31147:39)
+      at TransformPluginContext.error (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:31144:14)
+      at normalizeUrl (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:28083:18)
+      at async file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:28153:30
+      at async Promise.all (index 1)
+      at async TransformPluginContext.transform (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:28119:4)
+      at async EnvironmentPluginContainer.transform (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:30932:14)
+      at async loadAndTransform (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:20671:26)
+      at async viteTransformMiddleware (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:25205:20)
+13:13:36 [vite] (client) page reload hostinger/main.tsx
+13:13:37 [vite] (client) Pre-transform error: Failed to resolve import "/@react-refresh" from "index.html?html-proxy&index=0.js". Does the file exist?
+  Plugin: vite:import-analysis
+  File: C:/Users/HP/install-this-skill/outputs/mylekhpal/index.html?html-proxy&index=0.js:15:44
+  1  |  
+  2  |        if (import.meta.env.DEV) {
+  3  |          const RefreshRuntime = await import('/@react-refresh');
+     |                                              ^
+  4  |          RefreshRuntime.default.injectIntoGlobalHook(window);
+  5  |          window.$RefreshReg$ = () => {};
+13:13:37 [vite] Internal server error: Failed to resolve import "/@react-refresh" from "index.html?html-proxy&index=0.js". Does the file exist?
+  Plugin: vite:import-analysis
+  File: C:/Users/HP/install-this-skill/outputs/mylekhpal/index.html?html-proxy&index=0.js:15:44
+  1  |  
+  2  |        if (import.meta.env.DEV) {
+  3  |          const RefreshRuntime = await import('/@react-refresh');
+     |                                              ^
+  4  |          RefreshRuntime.default.injectIntoGlobalHook(window);
+  5  |          window.$RefreshReg$ = () => {};
+      at TransformPluginContext._formatLog (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:31147:39)
+      at TransformPluginContext.error (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:31144:14)
+      at normalizeUrl (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:28083:18)
+      at async file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:28153:30
+      at async Promise.all (index 1)
+      at async TransformPluginContext.transform (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:28119:4)
+      at async EnvironmentPluginContainer.transform (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:30932:14)
+      at async loadAndTransform (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:20671:26)
+      at async viteTransformMiddleware (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:25205:20)
+13:14:03 [vite] (client) hmr update /app/globals.css
+13:14:04 [vite] (client) Pre-transform error: Failed to resolve import "/@react-refresh" from "index.html?html-proxy&index=0.js". Does the file exist?
+  Plugin: vite:import-analysis
+  File: C:/Users/HP/install-this-skill/outputs/mylekhpal/index.html?html-proxy&index=0.js:15:44
+  1  |  
+  2  |        if (import.meta.env.DEV) {
+  3  |          const RefreshRuntime = await import('/@react-refresh');
+     |                                              ^
+  4  |          RefreshRuntime.default.injectIntoGlobalHook(window);
+  5  |          window.$RefreshReg$ = () => {};
+13:14:06 [vite] Internal server error: Failed to resolve import "/@react-refresh" from "index.html?html-proxy&index=0.js". Does the file exist?
+  Plugin: vite:import-analysis
+  File: C:/Users/HP/install-this-skill/outputs/mylekhpal/index.html?html-proxy&index=0.js:15:44
+  1  |  
+  2  |        if (import.meta.env.DEV) {
+  3  |          const RefreshRuntime = await import('/@react-refresh');
+     |                                              ^
+  4  |          RefreshRuntime.default.injectIntoGlobalHook(window);
+  5  |          window.$RefreshReg$ = () => {};
+      at TransformPluginContext._formatLog (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:31147:39)
+      at TransformPluginContext.error (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:31144:14)
+      at normalizeUrl (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:28083:18)
+      at async file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:28153:30
+      at async Promise.all (index 1)
+      at async TransformPluginContext.transform (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:28119:4)
+      at async EnvironmentPluginContainer.transform (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:30932:14)
+      at async loadAndTransform (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:20671:26)
+      at async viteTransformMiddleware (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:25205:20)
+13:14:17 [vite] (client) page reload hostinger/personal-marketing.tsx
+13:14:18 [vite] (client) Pre-transform error: Failed to resolve import "/@react-refresh" from "index.html?html-proxy&index=0.js". Does the file exist?
+  Plugin: vite:import-analysis
+  File: C:/Users/HP/install-this-skill/outputs/mylekhpal/index.html?html-proxy&index=0.js:15:44
+  1  |  
+  2  |        if (import.meta.env.DEV) {
+  3  |          const RefreshRuntime = await import('/@react-refresh');
+     |                                              ^
+  4  |          RefreshRuntime.default.injectIntoGlobalHook(window);
+  5  |          window.$RefreshReg$ = () => {};
+13:14:19 [vite] Internal server error: Failed to resolve import "/@react-refresh" from "index.html?html-proxy&index=0.js". Does the file exist?
+  Plugin: vite:import-analysis
+  File: C:/Users/HP/install-this-skill/outputs/mylekhpal/index.html?html-proxy&index=0.js:15:44
+  1  |  
+  2  |        if (import.meta.env.DEV) {
+  3  |          const RefreshRuntime = await import('/@react-refresh');
+     |                                              ^
+  4  |          RefreshRuntime.default.injectIntoGlobalHook(window);
+  5  |          window.$RefreshReg$ = () => {};
+      at TransformPluginContext._formatLog (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:31147:39)
+      at TransformPluginContext.error (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:31144:14)
+      at normalizeUrl (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:28083:18)
+      at async file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:28153:30
+      at async Promise.all (index 1)
+      at async TransformPluginContext.transform (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:28119:4)
+      at async EnvironmentPluginContainer.transform (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:30932:14)
+      at async loadAndTransform (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:20671:26)
+      at async viteTransformMiddleware (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:25205:20)
+13:14:41 [vite] (client) hmr update /app/globals.css
+13:14:42 [vite] (client) Pre-transform error: Failed to resolve import "/@react-refresh" from "index.html?html-proxy&index=0.js". Does the file exist?
+  Plugin: vite:import-analysis
+  File: C:/Users/HP/install-this-skill/outputs/mylekhpal/index.html?html-proxy&index=0.js:15:44
+  1  |  
+  2  |        if (import.meta.env.DEV) {
+  3  |          const RefreshRuntime = await import('/@react-refresh');
+     |                                              ^
+  4  |          RefreshRuntime.default.injectIntoGlobalHook(window);
+  5  |          window.$RefreshReg$ = () => {};
+13:14:43 [vite] Internal server error: Failed to resolve import "/@react-refresh" from "index.html?html-proxy&index=0.js". Does the file exist?
+  Plugin: vite:import-analysis
+  File: C:/Users/HP/install-this-skill/outputs/mylekhpal/index.html?html-proxy&index=0.js:15:44
+  1  |  
+  2  |        if (import.meta.env.DEV) {
+  3  |          const RefreshRuntime = await import('/@react-refresh');
+     |                                              ^
+  4  |          RefreshRuntime.default.injectIntoGlobalHook(window);
+  5  |          window.$RefreshReg$ = () => {};
+      at TransformPluginContext._formatLog (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:31147:39)
+      at TransformPluginContext.error (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:31144:14)
+      at normalizeUrl (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:28083:18)
+      at async file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:28153:30
+      at async Promise.all (index 1)
+      at async TransformPluginContext.transform (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:28119:4)
+      at async EnvironmentPluginContainer.transform (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:30932:14)
+      at async loadAndTransform (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:20671:26)
+      at async viteTransformMiddleware (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:25205:20)
+13:15:04 [vite] (client) page reload tests/branding.test.mjs
+13:15:05 [vite] (client) Pre-transform error: Failed to resolve import "/@react-refresh" from "index.html?html-proxy&index=0.js". Does the file exist?
+  Plugin: vite:import-analysis
+  File: C:/Users/HP/install-this-skill/outputs/mylekhpal/index.html?html-proxy&index=0.js:15:44
+  1  |  
+  2  |        if (import.meta.env.DEV) {
+  3  |          const RefreshRuntime = await import('/@react-refresh');
+     |                                              ^
+  4  |          RefreshRuntime.default.injectIntoGlobalHook(window);
+  5  |          window.$RefreshReg$ = () => {};
+13:15:05 [vite] Internal server error: Failed to resolve import "/@react-refresh" from "index.html?html-proxy&index=0.js". Does the file exist?
+  Plugin: vite:import-analysis
+  File: C:/Users/HP/install-this-skill/outputs/mylekhpal/index.html?html-proxy&index=0.js:15:44
+  1  |  
+  2  |        if (import.meta.env.DEV) {
+  3  |          const RefreshRuntime = await import('/@react-refresh');
+     |                                              ^
+  4  |          RefreshRuntime.default.injectIntoGlobalHook(window);
+  5  |          window.$RefreshReg$ = () => {};
+      at TransformPluginContext._formatLog (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:31147:39)
+      at TransformPluginContext.error (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:31144:14)
+      at normalizeUrl (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:28083:18)
+      at async file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:28153:30
+      at async Promise.all (index 1)
+      at async TransformPluginContext.transform (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:28119:4)
+      at async EnvironmentPluginContainer.transform (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:30932:14)
+      at async loadAndTransform (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:20671:26)
+      at async viteTransformMiddleware (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:25205:20)
+14:04:59 [vite] (client) hmr update /app/globals.css
+14:04:59 [vite] (client) hmr update /app/globals.css
+14:05:00 [vite] (client) Pre-transform error: Failed to resolve import "/@react-refresh" from "index.html?html-proxy&index=0.js". Does the file exist?
+  Plugin: vite:import-analysis
+  File: C:/Users/HP/install-this-skill/outputs/mylekhpal/index.html?html-proxy&index=0.js:15:44
+  1  |  
+  2  |        if (import.meta.env.DEV) {
+  3  |          const RefreshRuntime = await import('/@react-refresh');
+     |                                              ^
+  4  |          RefreshRuntime.default.injectIntoGlobalHook(window);
+  5  |          window.$RefreshReg$ = () => {};
+14:05:00 [vite] Internal server error: Failed to resolve import "/@react-refresh" from "index.html?html-proxy&index=0.js". Does the file exist?
+  Plugin: vite:import-analysis
+  File: C:/Users/HP/install-this-skill/outputs/mylekhpal/index.html?html-proxy&index=0.js:15:44
+  1  |  
+  2  |        if (import.meta.env.DEV) {
+  3  |          const RefreshRuntime = await import('/@react-refresh');
+     |                                              ^
+  4  |          RefreshRuntime.default.injectIntoGlobalHook(window);
+  5  |          window.$RefreshReg$ = () => {};
+      at TransformPluginContext._formatLog (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:31147:39)
+      at TransformPluginContext.error (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:31144:14)
+      at normalizeUrl (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:28083:18)
+      at async file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:28153:30
+      at async Promise.all (index 1)
+      at async TransformPluginContext.transform (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:28119:4)
+      at async EnvironmentPluginContainer.transform (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:30932:14)
+      at async loadAndTransform (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:20671:26)
+      at async viteTransformMiddleware (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:25205:20)
+14:05:58 [vite] (client) hmr update /app/globals.css
+14:05:58 [vite] (client) Pre-transform error: Failed to resolve import "/@react-refresh" from "index.html?html-proxy&index=0.js". Does the file exist?
+  Plugin: vite:import-analysis
+  File: C:/Users/HP/install-this-skill/outputs/mylekhpal/index.html?html-proxy&index=0.js:15:44
+  1  |  
+  2  |        if (import.meta.env.DEV) {
+  3  |          const RefreshRuntime = await import('/@react-refresh');
+     |                                              ^
+  4  |          RefreshRuntime.default.injectIntoGlobalHook(window);
+  5  |          window.$RefreshReg$ = () => {};
+14:05:58 [vite] Internal server error: Failed to resolve import "/@react-refresh" from "index.html?html-proxy&index=0.js". Does the file exist?
+  Plugin: vite:import-analysis
+  File: C:/Users/HP/install-this-skill/outputs/mylekhpal/index.html?html-proxy&index=0.js:15:44
+  1  |  
+  2  |        if (import.meta.env.DEV) {
+  3  |          const RefreshRuntime = await import('/@react-refresh');
+     |                                              ^
+  4  |          RefreshRuntime.default.injectIntoGlobalHook(window);
+  5  |          window.$RefreshReg$ = () => {};
+      at TransformPluginContext._formatLog (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:31147:39)
+      at TransformPluginContext.error (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:31144:14)
+      at normalizeUrl (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:28083:18)
+      at async file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:28153:30
+      at async Promise.all (index 1)
+      at async TransformPluginContext.transform (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:28119:4)
+      at async EnvironmentPluginContainer.transform (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:30932:14)
+      at async loadAndTransform (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:20671:26)
+      at async viteTransformMiddleware (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:25205:20)
+14:06:33 [vite] (client) hmr update /app/globals.css
+14:06:33 [vite] (client) Pre-transform error: Failed to resolve import "/@react-refresh" from "index.html?html-proxy&index=0.js". Does the file exist?
+  Plugin: vite:import-analysis
+  File: C:/Users/HP/install-this-skill/outputs/mylekhpal/index.html?html-proxy&index=0.js:15:44
+  1  |  
+  2  |        if (import.meta.env.DEV) {
+  3  |          const RefreshRuntime = await import('/@react-refresh');
+     |                                              ^
+  4  |          RefreshRuntime.default.injectIntoGlobalHook(window);
+  5  |          window.$RefreshReg$ = () => {};
+14:06:33 [vite] Internal server error: Failed to resolve import "/@react-refresh" from "index.html?html-proxy&index=0.js". Does the file exist?
+  Plugin: vite:import-analysis
+  File: C:/Users/HP/install-this-skill/outputs/mylekhpal/index.html?html-proxy&index=0.js:15:44
+  1  |  
+  2  |        if (import.meta.env.DEV) {
+  3  |          const RefreshRuntime = await import('/@react-refresh');
+     |                                              ^
+  4  |          RefreshRuntime.default.injectIntoGlobalHook(window);
+  5  |          window.$RefreshReg$ = () => {};
+      at TransformPluginContext._formatLog (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:31147:39)
+      at TransformPluginContext.error (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:31144:14)
+      at normalizeUrl (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:28083:18)
+      at async file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:28153:30
+      at async Promise.all (index 1)
+      at async TransformPluginContext.transform (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:28119:4)
+      at async EnvironmentPluginContainer.transform (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:30932:14)
+      at async loadAndTransform (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:20671:26)
+      at async viteTransformMiddleware (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:25205:20)
+14:07:42 [vite] (client) hmr update /app/globals.css
+14:07:42 [vite] (client) Pre-transform error: Failed to resolve import "/@react-refresh" from "index.html?html-proxy&index=0.js". Does the file exist?
+  Plugin: vite:import-analysis
+  File: C:/Users/HP/install-this-skill/outputs/mylekhpal/index.html?html-proxy&index=0.js:15:44
+  1  |  
+  2  |        if (import.meta.env.DEV) {
+  3  |          const RefreshRuntime = await import('/@react-refresh');
+     |                                              ^
+  4  |          RefreshRuntime.default.injectIntoGlobalHook(window);
+  5  |          window.$RefreshReg$ = () => {};
+14:07:43 [vite] Internal server error: Failed to resolve import "/@react-refresh" from "index.html?html-proxy&index=0.js". Does the file exist?
+  Plugin: vite:import-analysis
+  File: C:/Users/HP/install-this-skill/outputs/mylekhpal/index.html?html-proxy&index=0.js:15:44
+  1  |  
+  2  |        if (import.meta.env.DEV) {
+  3  |          const RefreshRuntime = await import('/@react-refresh');
+     |                                              ^
+  4  |          RefreshRuntime.default.injectIntoGlobalHook(window);
+  5  |          window.$RefreshReg$ = () => {};
+      at TransformPluginContext._formatLog (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:31147:39)
+      at TransformPluginContext.error (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:31144:14)
+      at normalizeUrl (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:28083:18)
+      at async file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:28153:30
+      at async Promise.all (index 1)
+      at async TransformPluginContext.transform (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:28119:4)
+      at async EnvironmentPluginContainer.transform (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:30932:14)
+      at async loadAndTransform (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:20671:26)
+      at async viteTransformMiddleware (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:25205:20)
+14:09:39 [vite] (client) hmr update /app/globals.css
+14:09:39 [vite] (client) Pre-transform error: Failed to resolve import "/@react-refresh" from "index.html?html-proxy&index=0.js". Does the file exist?
+  Plugin: vite:import-analysis
+  File: C:/Users/HP/install-this-skill/outputs/mylekhpal/index.html?html-proxy&index=0.js:15:44
+  1  |  
+  2  |        if (import.meta.env.DEV) {
+  3  |          const RefreshRuntime = await import('/@react-refresh');
+     |                                              ^
+  4  |          RefreshRuntime.default.injectIntoGlobalHook(window);
+  5  |          window.$RefreshReg$ = () => {};
+14:09:39 [vite] Internal server error: Failed to resolve import "/@react-refresh" from "index.html?html-proxy&index=0.js". Does the file exist?
+  Plugin: vite:import-analysis
+  File: C:/Users/HP/install-this-skill/outputs/mylekhpal/index.html?html-proxy&index=0.js:15:44
+  1  |  
+  2  |        if (import.meta.env.DEV) {
+  3  |          const RefreshRuntime = await import('/@react-refresh');
+     |                                              ^
+  4  |          RefreshRuntime.default.injectIntoGlobalHook(window);
+  5  |          window.$RefreshReg$ = () => {};
+      at TransformPluginContext._formatLog (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:31147:39)
+      at TransformPluginContext.error (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:31144:14)
+      at normalizeUrl (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:28083:18)
+      at async file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:28153:30
+      at async Promise.all (index 1)
+      at async TransformPluginContext.transform (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:28119:4)
+      at async EnvironmentPluginContainer.transform (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:30932:14)
+      at async loadAndTransform (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:20671:26)
+      at async viteTransformMiddleware (file:///C:/Users/HP/install-this-skill/outputs/mylekhpal/node_modules/vite/dist/node/chunks/node.js:25205:20)
+15:19:54 [vite] (client) page reload hostinger/legal-page.tsx
+15:19:59 [vite] (client) hmr update /app/globals.css
+15:20:04 [vite] (client) hmr update /app/globals.css
+15:22:25 [vite] (client) hmr update /app/globals.css
+15:22:30 [vite] (client) hmr update /app/globals.css
+15:22:35 [vite] (client) page reload docs/qa/MYLEKHPAL_AUTHENTICATED_QA_PLAN.md
+15:23:39 [vite] (client) hmr update /app/globals.css
+15:23:42 [vite] (client) hmr update /app/globals.css
+15:24:53 [vite] (client) hmr update /app/globals.css
+15:25:32 [vite] (client) hmr update /app/globals.css
+15:26:01 [vite] (client) hmr update /app/globals.css
+16:04:11 [vite] (client) hmr update /app/globals.css
+16:04:11 [vite] (client) hmr update /app/globals.css
+16:07:04 [vite] (client) hmr update /app/globals.css
+16:07:04 [vite] (client) hmr update /app/globals.css
+16:07:44 [vite] (client) hmr update /app/globals.css
+16:07:49 [vite] (client) hmr update /app/globals.css
+16:17:47 [vite] (client) hmr update /app/globals.css
+16:33:27 [vite] (client) hmr update /app/globals.css
+16:33:27 [vite] (client) hmr update /app/globals.css
+16:34:20 [vite] (client) hmr update /app/globals.css
+16:38:48 [vite] (client) hmr update /app/globals.css
+16:44:23 [vite] (client) hmr update /app/globals.css
+16:49:31 [vite] (client) hmr update /app/globals.css
+16:49:56 [vite] (client) hmr update /app/globals.css
+16:51:46 [vite] (client) hmr update /app/globals.css
+16:51:55 [vite] (client) hmr update /app/globals.css
+17:03:39 [vite] (client) hmr update /app/globals.css
+17:03:39 [vite] (client) hmr update /app/globals.css
+17:03:45 [vite] (client) hmr update /app/globals.css
+17:08:20 [vite] (client) hmr update /app/globals.css
+17:08:24 [vite] (client) hmr update /app/globals.css
+17:15:21 [vite] (client) hmr update /app/globals.css
+17:15:21 [vite] (client) hmr update /app/globals.css
+17:15:34 [vite] (client) hmr update /app/globals.css
+17:20:02 [vite] (client) hmr update /app/globals.css
+17:22:01 [vite] (client) hmr update /app/globals.css
+17:22:11 [vite] (client) hmr update /app/globals.css
+17:22:33 [vite] (client) hmr update /app/globals.css
+17:54:59 [vite] .env.local changed, restarting server...
+17:54:59 [vite] .env.local changed, restarting server...
+17:55:03 [vite] server restarted.
+17:56:19 [vite] .env.local changed, restarting server...
+17:56:19 [vite] server restarted.
+08:02:12 [vite] .env.local changed, restarting server...
+08:02:13 [vite] server restarted.
+08:14:00 [vite] .env.local changed, restarting server...
+08:14:00 [vite] .env.local changed, restarting server...
+08:14:04 [vite] server restarted.
+08:19:29 [vite] .env.local changed, restarting server...
+08:19:29 [vite] .env.local changed, restarting server...
+08:19:30 [vite] server restarted.
+08:22:07 [vite] .env.local changed, restarting server...

@@ -39,7 +39,7 @@ begin
   update public.journal_entries set status='posted' where id=balanced_id;
   set constraints all immediate;
 
-  -- 2. Unbalanced journal rejection.
+  -- 2. An entry inserted directly as posted is rejected, even with no lines.
   rejected := false;
   begin
     set constraints all deferred;

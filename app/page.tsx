@@ -24,9 +24,9 @@ export default function Home() {
           <img
             className="brand-mark"
             src="/brand/mylekhpal-logo.png"
-            alt="Mylekhpal logo"
+            alt="MyLekhpal logo"
           />
-          mylekhpal<span className="brand-dot">.</span>
+          MyLekhpal<span className="brand-dot">.</span>
         </a>
         <div className="navlinks">
           <a href="#workflow">How it works</a>
@@ -221,7 +221,7 @@ export default function Home() {
             Your CA knows the books.
           </h2>
           <p>
-            Mylekhpal brings both sides together, with simple business summaries
+            MyLekhpal brings both sides together, with simple business summaries
             and room for the accounting detail that matters.
           </p>
           <a className="button" href="/workspace?role=owner">
@@ -258,10 +258,10 @@ export default function Home() {
         <div className="compliance-grid">
           <article><b>Journals, ledgers and reports</b><span>The platform supports preparation and review of accounting records; it does not claim a special government software licence.</span></article>
           <article><b>GST filing and e-invoicing</b><span>Direct government filing or e-invoice connections are not offered unless the required authorised GSTN/GSP route and approvals are in place.</span></article>
-          <article><b>Professional services</b><span>MyLekhapal does not certify accounts, perform statutory audits, or replace regulated professional services.</span></article>
+          <article><b>Professional services</b><span>MyLekhpal does not certify accounts, perform statutory audits, or replace regulated professional services.</span></article>
           <article><b>Audit trail and changes</b><span>The product is designed to support identifiable, timestamped changes, approvals, reversals, and period controls. Finalised records must not be silently changed.</span></article>
         </div>
-        <p className="helper">If a future government integration is introduced, MyLekhapal will use the appropriate authorised route before that capability is advertised. No “government-approved” claim will be used without written approval from the relevant authority.</p>
+        <p className="helper">If a future government integration is introduced, MyLekhpal will use the appropriate authorised route before that capability is advertised. No “government-approved” claim will be used without written approval from the relevant authority.</p>
         <p className="helper">For context, see <a href="https://www.gstn.org.in/" target="_blank" rel="noreferrer">GSTN</a> and <a href="https://tallysolutions.com/accounting/what-accounting-software-is-considered-a-safe-bet-for-long-term-government-and-tax-compliance-in-india/" target="_blank" rel="noreferrer">Tally’s guidance</a>. This notice is informational and not legal or tax advice.</p>
       </section>
       <footer className="wrap">
@@ -269,9 +269,9 @@ export default function Home() {
           <img
             className="brand-mark"
             src="/brand/mylekhpal-logo.png"
-            alt="Mylekhpal logo"
+            alt="MyLekhpal logo"
           />
-          mylekhpal.
+          MyLekhpal.
         </a>
         <div className="footer-contact">
           <p>Rashi Bhartiya Innovation LLP</p>
